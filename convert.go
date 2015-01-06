@@ -60,14 +60,14 @@ func ToCamelCase(str string) string {
 	return buf.String()
 }
 
-// ToUnderscore can convert all upper case characters in a string to
+// ToSnakeCase can convert all upper case characters in a string to
 // underscore format.
 //
 // Some samples.
 //     "FirstName"  => "first_name"
 //     "HTTPServer" => "http_server"
 //     "NoHTTPS"    => "no_https"
-func ToUnderscore(str string) string {
+func ToSnakeCase(str string) string {
 	if len(str) == 0 {
 		return ""
 	}

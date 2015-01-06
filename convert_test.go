@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-func TestToUnderscore(t *testing.T) {
-	runTestCases(t, ToUnderscore, map[string]string{
+func TestToSnakeCase(t *testing.T) {
+	runTestCases(t, ToSnakeCase, map[string]string{
 		"HTTPServer":         "http_server",
 		"_camelCase":         "_camel_case",
 		"NoHTTPS":            "no_https",
