@@ -68,20 +68,21 @@ func ToCamelCase(str string) string {
 //     "HTTPServer" => "http_server"
 //     "NoHTTPS"    => "no_https"
 //     "GO_PATH"    => "go_path"
+//     "GO PATH"    => "go_path"      // space is converted to underscore.
+//     "GO-PATH"    => "go_path"      // hyphen is converted to underscore.
 func ToSnakeCase(str string) string {
 	if len(str) == 0 {
 		return ""
 	}
 
 	buf := &bytes.Buffer{}
-	var r0, r1 rune
+	var prev, r0, r1 rune
 	var size int
 
-	addUnderscore := false // become true if first non-underscore rune is found.
 	r0 = '_'
 
 	for len(str) > 0 {
-		addUnderscore = addUnderscore || r0 != '_'
+		prev = r0
 		r0, size = utf8.DecodeRuneInString(str)
 		str = str[size:]
 
@@ -90,11 +91,10 @@ func ToSnakeCase(str string) string {
 			buf.WriteByte(byte(str[0]))
 
 		case unicode.IsUpper(r0):
-			if addUnderscore {
+			if prev != '_' {
 				buf.WriteRune('_')
 			}
 
-			addUnderscore = true
 			buf.WriteRune(unicode.ToLower(r0))
 
 			if len(str) == 0 {
@@ -125,25 +125,32 @@ func ToSnakeCase(str string) string {
 				}
 
 				if !unicode.IsUpper(r0) {
-					if r0 == '_' {
+					if r0 == '_' || r0 == ' ' || r0 == '-' {
+						r0 = '_'
+
 						buf.WriteRune(unicode.ToLower(r1))
 					} else {
 						buf.WriteRune('_')
 						buf.WriteRune(unicode.ToLower(r1))
 						buf.WriteRune(r0)
 					}
+
 					break
 				}
 
 				buf.WriteRune(unicode.ToLower(r1))
 			}
 
-			if len(str) == 0 {
+			if len(str) == 0 || r0 == '_' {
 				buf.WriteRune(unicode.ToLower(r0))
 				break
 			}
 
 		default:
+			if r0 == ' ' || r0 == '-' {
+				r0 = '_'
+			}
+
 			buf.WriteRune(r0)
 		}
 	}
