@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func runTestCases(t *testing.T, converter func(string)string, cases map[string]string) {
+func runTestCases(t *testing.T, converter func(string) string, cases map[string]string) {
 	for k, v := range cases {
 		s := converter(k)
 

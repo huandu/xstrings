@@ -72,7 +72,7 @@ func ToUnderscore(str string) string {
 		return ""
 	}
 
- 	buf := &bytes.Buffer{}
+	buf := &bytes.Buffer{}
 	var r0, r1 rune
 	var size int
 
