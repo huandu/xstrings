@@ -13,8 +13,13 @@ func TestToSnakeCase(t *testing.T) {
 		"_camelCase":         "_camel_case",
 		"NoHTTPS":            "no_https",
 		"Wi_thF":             "wi_th_f",
-		"_AnotherTES_TCaseP": "__another_te_s__t_case_p",
+		"_AnotherTES_TCaseP": "_another_tes_t_case_p",
 		"ALL":                "all",
+		"_HELLO_WORLD_":      "_hello_world_",
+		"HELLO_WORLD":        "hello_world",
+		"HELLO____WORLD":     "hello____world",
+		"TW":                 "tw",
+		"_C":                 "_c",
 	})
 }
 

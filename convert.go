@@ -67,6 +67,7 @@ func ToCamelCase(str string) string {
 //     "FirstName"  => "first_name"
 //     "HTTPServer" => "http_server"
 //     "NoHTTPS"    => "no_https"
+//     "GO_PATH"    => "go_path"
 func ToSnakeCase(str string) string {
 	if len(str) == 0 {
 		return ""
@@ -76,7 +77,11 @@ func ToSnakeCase(str string) string {
 	var r0, r1 rune
 	var size int
 
+	addUnderscore := false // become true if first non-underscore rune is found.
+	r0 = '_'
+
 	for len(str) > 0 {
+		addUnderscore = addUnderscore || r0 != '_'
 		r0, size = utf8.DecodeRuneInString(str)
 		str = str[size:]
 
@@ -85,10 +90,11 @@ func ToSnakeCase(str string) string {
 			buf.WriteByte(byte(str[0]))
 
 		case unicode.IsUpper(r0):
-			if buf.Len() > 0 {
+			if addUnderscore {
 				buf.WriteRune('_')
 			}
 
+			addUnderscore = true
 			buf.WriteRune(unicode.ToLower(r0))
 
 			if len(str) == 0 {
@@ -119,9 +125,13 @@ func ToSnakeCase(str string) string {
 				}
 
 				if !unicode.IsUpper(r0) {
-					buf.WriteRune('_')
-					buf.WriteRune(unicode.ToLower(r1))
-					buf.WriteRune(r0)
+					if r0 == '_' {
+						buf.WriteRune(unicode.ToLower(r1))
+					} else {
+						buf.WriteRune('_')
+						buf.WriteRune(unicode.ToLower(r1))
+						buf.WriteRune(r0)
+					}
 					break
 				}
 
@@ -130,6 +140,7 @@ func ToSnakeCase(str string) string {
 
 			if len(str) == 0 {
 				buf.WriteRune(unicode.ToLower(r0))
+				break
 			}
 
 		default:
