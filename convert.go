@@ -157,3 +157,30 @@ func ToSnakeCase(str string) string {
 
 	return buf.String()
 }
+
+// SwapCase will swap characters case from upper to lower or lower to upper.
+func SwapCase(str string) string {
+	var r rune
+	var size int
+
+	buf := &bytes.Buffer{}
+
+	for len(str) > 0 {
+		r, size = utf8.DecodeRuneInString(str)
+
+		switch {
+		case unicode.IsUpper(r):
+			buf.WriteRune(unicode.ToLower(r))
+
+		case unicode.IsLower(r):
+			buf.WriteRune(unicode.ToUpper(r))
+
+		default:
+			buf.WriteRune(r)
+		}
+
+		str = str[size:]
+	}
+
+	return buf.String()
+}

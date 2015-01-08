@@ -35,3 +35,10 @@ func TestToCamelCase(t *testing.T) {
 		"all":             "All",
 	})
 }
+
+func TestSwapCase(t *testing.T) {
+	runTestCases(t, SwapCase, map[string]string{
+		"swapCase": "SWAPcASE",
+		"Θ~λa云Ξπ":  "θ~ΛA云ξΠ",
+	})
+}
