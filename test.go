@@ -7,6 +7,10 @@ import (
 	"testing"
 )
 
+const (
+	separator = " ¶ "
+)
+
 func runTestCases(t *testing.T, converter func(string) string, cases map[string]string) {
 	for k, v := range cases {
 		s := converter(k)

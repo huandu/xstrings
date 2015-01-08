@@ -4,6 +4,7 @@
 package xstrings
 
 import (
+	"strings"
 	"unicode/utf8"
 )
 
@@ -60,4 +61,22 @@ func Slice(str string, start, end int) string {
 	}
 
 	return origin[startPos:endPos]
+}
+
+// Partition splits a string by sep into three parts.
+// The return value is a slice of strings with head, match and tail.
+//
+// If str contains sep, for example "hello" and "l", Partition returns
+//     []string{"he", "l", "lo"}
+//
+// If str doesn't contain sep, for example "hello" and "x", Partition returns
+//     []string{"hello", "", ""}
+func Partition(str, sep string) []string {
+	index := strings.Index(str, sep)
+
+	if index == -1 {
+		return []string{str, "", ""}
+	}
+
+	return []string{str[:index], sep, str[index+len(sep):]}
 }

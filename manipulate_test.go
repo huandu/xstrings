@@ -25,7 +25,7 @@ func TestSlice(t *testing.T) {
 			}
 		}()
 
-		strs := strings.Split(str, " ¶ ")
+		strs := strings.Split(str, separator)
 		start, _ := strconv.ParseInt(strs[1], 10, 0)
 		end, _ := strconv.ParseInt(strs[2], 10, 0)
 
@@ -44,5 +44,25 @@ func TestSlice(t *testing.T) {
 		"超出范围哦 ¶ 2 ¶ 6":                      "out of range",
 		"don't do this ¶ 3 ¶ 2":              "out of range",
 		"千gan万de不piao要liang ¶ 19 ¶ 19":       "out of range",
+	})
+}
+
+func TestPartition(t *testing.T) {
+	PartitionRunner := func(str string) string {
+		inputs := strings.Split(str, separator)
+		strs := Partition(inputs[0], inputs[1])
+		return strings.Join(strs, separator)
+	}
+
+	runTestCases(t, PartitionRunner, map[string]string{
+		"hello ¶ l":           "he ¶ l ¶ lo",
+		"中文总少不了 ¶ 少":          "中文总 ¶ 少 ¶ 不了",
+		"z这个zh英文混排hao不 ¶ h英文": "z这个z ¶ h英文 ¶ 混排hao不",
+		"边界tiao件zen能忘 ¶ 边界":   " ¶ 边界 ¶ tiao件zen能忘",
+		"尾巴ye别忘le ¶ 忘le":      "尾巴ye别 ¶ 忘le ¶ ",
+
+		"hello ¶ x":     "hello ¶  ¶ ",
+		"不是晩香玉 ¶ 晚":     "不是晩香玉 ¶  ¶ ", // Hint: 晩 is not 晚 :)
+		"来ge混排ba ¶ e 混": "来ge混排ba ¶  ¶ ",
 	})
 }
