@@ -184,3 +184,39 @@ func SwapCase(str string) string {
 
 	return buf.String()
 }
+
+// Converts first rune to upper case if necessary.
+func FirstRuneToUpper(str string) string {
+	if str == "" {
+		return str
+	}
+
+	r, size := utf8.DecodeRuneInString(str)
+
+	if !unicode.IsLower(r) {
+		return str
+	}
+
+	buf := &bytes.Buffer{}
+	buf.WriteRune(unicode.ToUpper(r))
+	buf.WriteString(str[size:])
+	return buf.String()
+}
+
+// Converts first rune to lower case if necessary.
+func FirstRuneToLower(str string) string {
+	if str == "" {
+		return str
+	}
+
+	r, size := utf8.DecodeRuneInString(str)
+
+	if !unicode.IsUpper(r) {
+		return str
+	}
+
+	buf := &bytes.Buffer{}
+	buf.WriteRune(unicode.ToLower(r))
+	buf.WriteString(str[size:])
+	return buf.String()
+}

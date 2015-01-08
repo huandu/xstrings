@@ -42,3 +42,19 @@ func TestSwapCase(t *testing.T) {
 		"Θ~λa云Ξπ":  "θ~ΛA云ξΠ",
 	})
 }
+
+func TestFirstRuneToUpper(t *testing.T) {
+	runTestCases(t, FirstRuneToUpper, map[string]string{
+		"hello, world!": "Hello, world!",
+		"Hello, world!": "Hello, world!",
+		"你好，世界！":        "你好，世界！",
+	})
+}
+
+func TestFirstRuneToLower(t *testing.T) {
+	runTestCases(t, FirstRuneToLower, map[string]string{
+		"hello, world!": "hello, world!",
+		"Hello, world!": "hello, world!",
+		"你好，世界！":        "你好，世界！",
+	})
+}
