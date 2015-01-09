@@ -114,3 +114,16 @@ func TestInsert(t *testing.T) {
 		sep("超tian出yuan边tu界po", "foo", "17"): "out of range",
 	})
 }
+
+func TestScrub(t *testing.T) {
+	ScrubRunner := func(str string) string {
+		strs := split(str)
+		return Scrub(strs[0], strs[1])
+	}
+
+	runTestCases(t, ScrubRunner, _M{
+		sep("ab\uFFFDcd\xFF\xCEefg\xFF\xFC\xFD\xFAhijk", "*"): "ab*cd*efg*hijk",
+		sep("no错误です", "*"):                                    "no错误です",
+		sep("", "*"):                                          "",
+	})
+}

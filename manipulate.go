@@ -4,6 +4,7 @@
 package xstrings
 
 import (
+	"bytes"
 	"strings"
 	"unicode/utf8"
 )
@@ -117,4 +118,47 @@ func LastPartition(str, sep string) []string {
 // If index is out of range of dst, panic with out of range.
 func Insert(dst, src string, index int) string {
 	return Slice(dst, 0, index) + src + Slice(dst, index, -1)
+}
+
+// Scrubs invalid utf8 bytes with repl string.
+// Adjacent invalid bytes are replaced only once.
+func Scrub(str, repl string) string {
+	var buf *bytes.Buffer
+	var r rune
+	var size, pos int
+	var hasError bool
+
+	origin := str
+
+	for len(str) > 0 {
+		r, size = utf8.DecodeRuneInString(str)
+
+		if r == utf8.RuneError {
+			if !hasError {
+				if buf == nil {
+					buf = &bytes.Buffer{}
+				}
+
+				buf.WriteString(origin[:pos])
+				hasError = true
+			}
+		} else if hasError {
+			hasError = false
+			buf.WriteString(repl)
+
+			origin = origin[pos:]
+			pos = 0
+		}
+
+		pos += size
+		str = str[size:]
+	}
+
+	if buf != nil {
+		buf.WriteString(origin)
+		return buf.String()
+	}
+
+	// No invalid byte.
+	return origin
 }
