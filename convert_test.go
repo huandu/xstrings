@@ -8,7 +8,7 @@ import (
 )
 
 func TestToSnakeCase(t *testing.T) {
-	runTestCases(t, ToSnakeCase, map[string]string{
+	runTestCases(t, ToSnakeCase, _M{
 		"HTTPServer":         "http_server",
 		"_camelCase":         "_camel_case",
 		"NoHTTPS":            "no_https",
@@ -27,7 +27,7 @@ func TestToSnakeCase(t *testing.T) {
 }
 
 func TestToCamelCase(t *testing.T) {
-	runTestCases(t, ToCamelCase, map[string]string{
+	runTestCases(t, ToCamelCase, _M{
 		"http_server":     "HttpServer",
 		"_camel_case":     "_CamelCase",
 		"no_https":        "NoHttps",
@@ -37,14 +37,14 @@ func TestToCamelCase(t *testing.T) {
 }
 
 func TestSwapCase(t *testing.T) {
-	runTestCases(t, SwapCase, map[string]string{
+	runTestCases(t, SwapCase, _M{
 		"swapCase": "SWAPcASE",
 		"Θ~λa云Ξπ":  "θ~ΛA云ξΠ",
 	})
 }
 
 func TestFirstRuneToUpper(t *testing.T) {
-	runTestCases(t, FirstRuneToUpper, map[string]string{
+	runTestCases(t, FirstRuneToUpper, _M{
 		"hello, world!": "Hello, world!",
 		"Hello, world!": "Hello, world!",
 		"你好，世界！":        "你好，世界！",
@@ -52,7 +52,7 @@ func TestFirstRuneToUpper(t *testing.T) {
 }
 
 func TestFirstRuneToLower(t *testing.T) {
-	runTestCases(t, FirstRuneToLower, map[string]string{
+	runTestCases(t, FirstRuneToLower, _M{
 		"hello, world!": "hello, world!",
 		"Hello, world!": "hello, world!",
 		"你好，世界！":        "你好，世界！",

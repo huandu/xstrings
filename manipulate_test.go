@@ -10,7 +10,7 @@ import (
 )
 
 func TestReverse(t *testing.T) {
-	runTestCases(t, Reverse, map[string]string{
+	runTestCases(t, Reverse, _M{
 		"reverse string": "gnirts esrever",
 		"中文如何？":          "？何如文中",
 		"中en文混~排怎样？a":    "a？样怎排~混文ne中",
@@ -25,7 +25,7 @@ func TestSlice(t *testing.T) {
 			}
 		}()
 
-		strs := strings.Split(str, separator)
+		strs := split(str)
 		start, _ := strconv.ParseInt(strs[1], 10, 0)
 		end, _ := strconv.ParseInt(strs[2], 10, 0)
 
@@ -33,17 +33,17 @@ func TestSlice(t *testing.T) {
 		return
 	}
 
-	runTestCases(t, SliceRunner, map[string]string{
-		"abcdefghijk ¶ 3 ¶ 8":      "defgh",
-		"来点中文如何？ ¶ 2 ¶ 7":          "中文如何？",
-		"中en文混~排总是少不了的a ¶ 2 ¶ 8":   "n文混~排总",
-		"中en文混~排总是少不了的a ¶ 0 ¶ 0":   "",
-		"中en文混~排总是少不了的a ¶ 14 ¶ 14": "",
+	runTestCases(t, SliceRunner, _M{
+		sep("abcdefghijk", "3", "8"):      "defgh",
+		sep("来点中文如何？", "2", "7"):          "中文如何？",
+		sep("中en文混~排总是少不了的a", "2", "8"):   "n文混~排总",
+		sep("中en文混~排总是少不了的a", "0", "0"):   "",
+		sep("中en文混~排总是少不了的a", "14", "14"): "",
 
-		"let us slice out of range ¶ -3 ¶ 3": "out of range",
-		"超出范围哦 ¶ 2 ¶ 6":                      "out of range",
-		"don't do this ¶ 3 ¶ 2":              "out of range",
-		"千gan万de不piao要liang ¶ 19 ¶ 19":       "out of range",
+		sep("let us slice out of range", "-3", "3"): "out of range",
+		sep("超出范围哦", "2", "6"):                      "out of range",
+		sep("don't do this", "3", "2"):              "out of range",
+		sep("千gan万de不piao要liang", "19", "19"):       "out of range",
 	})
 }
 
@@ -54,15 +54,35 @@ func TestPartition(t *testing.T) {
 		return strings.Join(strs, separator)
 	}
 
-	runTestCases(t, PartitionRunner, map[string]string{
-		"hello ¶ l":           "he ¶ l ¶ lo",
-		"中文总少不了 ¶ 少":          "中文总 ¶ 少 ¶ 不了",
-		"z这个zh英文混排hao不 ¶ h英文": "z这个z ¶ h英文 ¶ 混排hao不",
-		"边界tiao件zen能忘 ¶ 边界":   " ¶ 边界 ¶ tiao件zen能忘",
-		"尾巴ye别忘le ¶ 忘le":      "尾巴ye别 ¶ 忘le ¶ ",
+	runTestCases(t, PartitionRunner, _M{
+		sep("hello", "l"):           sep("he", "l", "lo"),
+		sep("中文总少不了", "少"):          sep("中文总", "少", "不了"),
+		sep("z这个zh英文混排hao不", "h英文"): sep("z这个z", "h英文", "混排hao不"),
+		sep("边界tiao件zen能忘", "边界"):   sep("", "边界", "tiao件zen能忘"),
+		sep("尾巴ye别忘le", "忘le"):      sep("尾巴ye别", "忘le", ""),
 
-		"hello ¶ x":     "hello ¶  ¶ ",
-		"不是晩香玉 ¶ 晚":     "不是晩香玉 ¶  ¶ ", // Hint: 晩 is not 晚 :)
-		"来ge混排ba ¶ e 混": "来ge混排ba ¶  ¶ ",
+		sep("hello", "x"):     sep("hello", "", ""),
+		sep("不是晩香玉", "晚"):     sep("不是晩香玉", "", ""), // Hint: 晩 is not 晚 :)
+		sep("来ge混排ba", "e 混"): sep("来ge混排ba", "", ""),
+	})
+}
+
+func TestLastPartition(t *testing.T) {
+	PartitionRunner := func(str string) string {
+		inputs := strings.Split(str, separator)
+		strs := LastPartition(inputs[0], inputs[1])
+		return strings.Join(strs, separator)
+	}
+
+	runTestCases(t, PartitionRunner, _M{
+		sep("hello", "l"):               sep("hel", "l", "o"),
+		sep("少量中文总少不了", "少"):            sep("少量中文总", "少", "不了"),
+		sep("z这个zh英文ch英文混排hao不", "h英文"): sep("z这个zh英文c", "h英文", "混排hao不"),
+		sep("边界tiao件zen能忘边界", "边界"):     sep("边界tiao件zen能忘", "边界", ""),
+		sep("尾巴ye别忘le", "尾巴"):           sep("", "尾巴", "ye别忘le"),
+
+		sep("hello", "x"):     sep("", "", "hello"),
+		sep("不是晩香玉", "晚"):     sep("", "", "不是晩香玉"), // Hint: 晩 is not 晚 :)
+		sep("来ge混排ba", "e 混"): sep("", "", "来ge混排ba"),
 	})
 }

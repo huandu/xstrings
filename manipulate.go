@@ -80,3 +80,21 @@ func Partition(str, sep string) []string {
 
 	return []string{str[:index], sep, str[index+len(sep):]}
 }
+
+// LastPartition splits a string by last instance of sep into three parts.
+// The return value is a slice of strings with head, match and tail.
+//
+// If str contains sep, for example "hello" and "l", LastPartition returns
+//     []string{"hel", "l", "o"}
+//
+// If str doesn't contain sep, for example "hello" and "x", LastPartition returns
+//     []string{"", "", "hello"}
+func LastPartition(str, sep string) []string {
+	index := strings.LastIndex(str, sep)
+
+	if index == -1 {
+		return []string{"", "", str}
+	}
+
+	return []string{str[:index], sep, str[index+len(sep):]}
+}

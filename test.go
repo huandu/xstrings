@@ -4,8 +4,11 @@
 package xstrings
 
 import (
+	"strings"
 	"testing"
 )
+
+type _M map[string]string
 
 const (
 	separator = " ¶ "
@@ -19,4 +22,12 @@ func runTestCases(t *testing.T, converter func(string) string, cases map[string]
 			t.Fatalf("case fails. [expected:%v] [actual:%v] [source:%v]", v, s, k)
 		}
 	}
+}
+
+func sep(strs ...string) string {
+	return strings.Join(strs, separator)
+}
+
+func split(str string) []string {
+	return strings.Split(str, separator)
 }
