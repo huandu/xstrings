@@ -20,3 +20,19 @@ func TestLen(t *testing.T) {
 		"":          "0",
 	})
 }
+
+func TestWordCount(t *testing.T) {
+	WordCountRunner := func(str string) string {
+		return fmt.Sprint(WordCount(str))
+	}
+
+	runTestCases(t, WordCountRunner, _M{
+		"one word: λ":             "3",
+		"中文":                      "0",
+		"你好，sekai！":               "1",
+		"oh, it's super-fancy!!a": "4",
+		"":        "0",
+		"-":       "0",
+		"it's-'s": "1",
+	})
+}

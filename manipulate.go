@@ -162,3 +162,48 @@ func Scrub(str, repl string) string {
 	// No invalid byte.
 	return origin
 }
+
+// Splits a string into words. Returns a slice of words.
+// If there is no word in a string, return nil.
+//
+// Word is defined as a locale dependent string containing alphabetic characters,
+// which may also contain but not start with `'` and `-` characters.
+func WordSplit(str string) []string {
+	var word string
+	var words []string
+	var r rune
+	var size, pos int
+
+	inWord := false
+
+	for len(str) > 0 {
+		r, size = utf8.DecodeRuneInString(str)
+
+		switch {
+		case isAlphabet(r):
+			if !inWord {
+				inWord = true
+				word = str
+				pos = 0
+			}
+
+		case inWord && (r == '\'' || r == '-'):
+			// Still in word.
+
+		default:
+			if inWord {
+				inWord = false
+				words = append(words, word[:pos])
+			}
+		}
+
+		pos += size
+		str = str[size:]
+	}
+
+	if inWord {
+		words = append(words, word[:pos])
+	}
+
+	return words
+}

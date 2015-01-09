@@ -53,7 +53,7 @@ func TestPartition(t *testing.T) {
 	PartitionRunner := func(str string) string {
 		inputs := strings.Split(str, separator)
 		strs := Partition(inputs[0], inputs[1])
-		return strings.Join(strs, separator)
+		return sep(strs...)
 	}
 
 	runTestCases(t, PartitionRunner, _M{
@@ -73,7 +73,7 @@ func TestLastPartition(t *testing.T) {
 	PartitionRunner := func(str string) string {
 		inputs := strings.Split(str, separator)
 		strs := LastPartition(inputs[0], inputs[1])
-		return strings.Join(strs, separator)
+		return sep(strs...)
 	}
 
 	runTestCases(t, PartitionRunner, _M{
@@ -125,5 +125,17 @@ func TestScrub(t *testing.T) {
 		sep("ab\uFFFDcd\xFF\xCEefg\xFF\xFC\xFD\xFAhijk", "*"): "ab*cd*efg*hijk",
 		sep("no错误です", "*"):                                    "no错误です",
 		sep("", "*"):                                          "",
+	})
+}
+
+func TestWordSplit(t *testing.T) {
+	WordSplitRunner := func(str string) string {
+		return sep(WordSplit(str)...)
+	}
+
+	runTestCases(t, WordSplitRunner, _M{
+		"one word":                   sep("one", "word"),
+		"一个字：把他给我拿下！":                "",
+		"it's a super-fancy one!!!a": sep("it's", "a", "super-fancy", "one", "a"),
 	})
 }
