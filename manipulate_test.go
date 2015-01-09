@@ -137,5 +137,6 @@ func TestWordSplit(t *testing.T) {
 		"one word":                   sep("one", "word"),
 		"一个字：把他给我拿下！":                "",
 		"it's a super-fancy one!!!a": sep("it's", "a", "super-fancy", "one", "a"),
+		"a -b-c' 'd'e":               sep("a", "b-c'", "d'e"),
 	})
 }
