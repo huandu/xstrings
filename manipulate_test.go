@@ -39,6 +39,8 @@ func TestSlice(t *testing.T) {
 		sep("中en文混~排总是少不了的a", "2", "8"):   "n文混~排总",
 		sep("中en文混~排总是少不了的a", "0", "0"):   "",
 		sep("中en文混~排总是少不了的a", "14", "14"): "",
+		sep("中en文混~排总是少不了的a", "5", "-1"):  "~排总是少不了的a",
+		sep("中en文混~排总是少不了的a", "14", "-1"): "",
 
 		sep("let us slice out of range", "-3", "3"): "out of range",
 		sep("超出范围哦", "2", "6"):                      "out of range",
@@ -84,5 +86,31 @@ func TestLastPartition(t *testing.T) {
 		sep("hello", "x"):     sep("", "", "hello"),
 		sep("不是晩香玉", "晚"):     sep("", "", "不是晩香玉"), // Hint: 晩 is not 晚 :)
 		sep("来ge混排ba", "e 混"): sep("", "", "来ge混排ba"),
+	})
+}
+
+func TestInsert(t *testing.T) {
+	InsertRunner := func(str string) (result string) {
+		defer func() {
+			if e := recover(); e != nil {
+				result = e.(string)
+			}
+		}()
+
+		strs := split(str)
+		index, _ := strconv.ParseInt(strs[2], 10, 0)
+		result = Insert(strs[0], strs[1], int(index))
+		return
+	}
+
+	runTestCases(t, InsertRunner, _M{
+		sep("abcdefg", "hi", "3"):    "abchidefg",
+		sep("少量中文是必须的", "混pai", "4"): "少量中文混pai是必须的",
+		sep("zh英文hun排", "~！", "5"):   "zh英文h~！un排",
+		sep("插在begining", "我", "0"):  "我插在begining",
+		sep("插在ending", "我", "8"):    "插在ending我",
+
+		sep("超tian出yuan边tu界po", "foo", "-1"): "out of range",
+		sep("超tian出yuan边tu界po", "foo", "17"): "out of range",
 	})
 }

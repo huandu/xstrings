@@ -27,24 +27,36 @@ func Reverse(str string) string {
 }
 
 // Slice a string by rune.
-// Start and end must satisfy 0 <= start <= end <= rune length.
+//
+// Start must satisfy 0 <= start <= rune length.
+//
+// End can be positive, zero or negative.
+// If end >= 0, start and end must satisfy start <= end <= rune length.
+// If end < 0, it means slice to the end of string.
+//
 // Otherwise, Slice will panic as out of range.
 func Slice(str string, start, end int) string {
 	var size, startPos, endPos int
 
 	origin := str
 
-	if start < 0 || end > len(str) || start > end {
+	if start < 0 || end > len(str) || (end >= 0 && start > end) {
 		panic("out of range")
 	}
 
-	end -= start
+	if end >= 0 {
+		end -= start
+	}
 
 	for start > 0 && len(str) > 0 {
 		_, size = utf8.DecodeRuneInString(str)
 		start--
 		startPos += size
 		str = str[size:]
+	}
+
+	if end < 0 {
+		return origin[startPos:]
 	}
 
 	endPos = startPos
@@ -97,4 +109,12 @@ func LastPartition(str, sep string) []string {
 	}
 
 	return []string{str[:index], sep, str[index+len(sep):]}
+}
+
+// Insert src into dst at given rune index.
+// Index is counted by runes instead of bytes.
+//
+// If index is out of range of dst, panic with out of range.
+func Insert(dst, src string, index int) string {
+	return Slice(dst, 0, index) + src + Slice(dst, index, -1)
 }

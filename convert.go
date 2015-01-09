@@ -12,9 +12,12 @@ import (
 // ToCamelCase can convert all lower case characters behind underscores
 // to upper case character.
 // Underscore character will be removed in result except following cases.
-//     * More than 1 underscore, e.g. "a__b" => "A_B"
-//     * At the beginning of string, e.g. "_a" => "_A"
-//     * At the end of string, e.g. "ab_" => "Ab_"
+//     * More than 1 underscore.
+//           "a__b" => "A_B"
+//     * At the beginning of string.
+//           "_a" => "_A"
+//     * At the end of string.
+//           "ab_" => "Ab_"
 func ToCamelCase(str string) string {
 	if len(str) == 0 {
 		return ""
