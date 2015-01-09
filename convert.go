@@ -280,6 +280,14 @@ func ShuffleSource(str string, src rand.Source) string {
 //     * a - z
 //     * A - Z
 //     * 0 - 9
+//
+// Samples (borrowed from ruby's String#succ document):
+//     "abcd"      => "abce"
+//		 "THX1138"   => "THX1139"
+//		 "<<koala>>" => "<<koalb>>"
+//		 "1999zzz"   => "2000aaa"
+//		 "ZZZ9999"   => "AAAA0000"
+//		 "***"       => "**+"
 func Successor(str string) string {
 	if str == "" {
 		return str
