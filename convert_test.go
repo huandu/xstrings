@@ -146,3 +146,18 @@ func TestShuffleSource(t *testing.T) {
 		"zh英文hun排":    "hh英nzu文排",
 	})
 }
+
+func TestSuccessor(t *testing.T) {
+	runTestCases(t, Successor, _M{
+		"":          "",
+		"abcd":      "abce",
+		"THX1138":   "THX1139",
+		"<<koala>>": "<<koalb>>",
+		"1999zzz":   "2000aaa",
+		"ZZZ9999":   "AAAA0000",
+		"***":       "**+",
+
+		"来点中文试试":               "来点中文试诖",
+		"中cZ英ZZ文zZ混9zZ9杂99进z位": "中dA英AA文aA混0aA0杂00进a位",
+	})
+}
