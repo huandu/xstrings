@@ -1,6 +1,7 @@
 # xstrings #
 
 [![Build Status](https://travis-ci.org/huandu/xstrings.png?branch=master)](https://travis-ci.org/huandu/xstrings)
+[![GoDoc](https://godoc.org/github.com/huandu/xstrings?status.svg)](https://godoc.org/github.com/huandu/xstrings)
 
 Go [strings](http://golang.org/pkg/strings) package only has a few string algorithms. There are lots of other useful algorithms missing.
 
