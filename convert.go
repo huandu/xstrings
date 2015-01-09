@@ -5,6 +5,7 @@ package xstrings
 
 import (
 	"bytes"
+	"math/rand"
 	"unicode"
 	"unicode/utf8"
 )
@@ -188,7 +189,7 @@ func SwapCase(str string) string {
 	return buf.String()
 }
 
-// Converts first rune to upper case if necessary.
+// FirstRuneToUpper converts first rune to upper case if necessary.
 func FirstRuneToUpper(str string) string {
 	if str == "" {
 		return str
@@ -206,7 +207,7 @@ func FirstRuneToUpper(str string) string {
 	return buf.String()
 }
 
-// Converts first rune to lower case if necessary.
+// FirstRuneToLower converts first rune to lower case if necessary.
 func FirstRuneToLower(str string) string {
 	if str == "" {
 		return str
@@ -222,4 +223,46 @@ func FirstRuneToLower(str string) string {
 	buf.WriteRune(unicode.ToLower(r))
 	buf.WriteString(str[size:])
 	return buf.String()
+}
+
+// Shuffle randomizes runes in a string and returns the result.
+// It uses default random source in `math/rand`.
+func Shuffle(str string) string {
+	if str == "" {
+		return str
+	}
+
+	runes := []rune(str)
+	index := 0
+
+	for i := len(runes) - 1; i > 0; i-- {
+		index = rand.Intn(i + 1)
+
+		if i != index {
+			runes[i], runes[index] = runes[index], runes[i]
+		}
+	}
+
+	return string(runes)
+}
+
+// ShuffleSource randomizes runes in a string with given random source.
+func ShuffleSource(str string, src rand.Source) string {
+	if str == "" {
+		return str
+	}
+
+	runes := []rune(str)
+	index := 0
+	r := rand.New(src)
+
+	for i := len(runes) - 1; i > 0; i-- {
+		index = r.Intn(i + 1)
+
+		if i != index {
+			runes[i], runes[index] = runes[index], runes[i]
+		}
+	}
+
+	return string(runes)
 }

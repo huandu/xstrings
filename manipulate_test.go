@@ -18,7 +18,7 @@ func TestReverse(t *testing.T) {
 }
 
 func TestSlice(t *testing.T) {
-	SliceRunner := func(str string) (result string) {
+	runner := func(str string) (result string) {
 		defer func() {
 			if e := recover(); e != nil {
 				result = e.(string)
@@ -33,7 +33,7 @@ func TestSlice(t *testing.T) {
 		return
 	}
 
-	runTestCases(t, SliceRunner, _M{
+	runTestCases(t, runner, _M{
 		sep("abcdefghijk", "3", "8"):      "defgh",
 		sep("来点中文如何？", "2", "7"):          "中文如何？",
 		sep("中en文混~排总是少不了的a", "2", "8"):   "n文混~排总",
@@ -50,13 +50,13 @@ func TestSlice(t *testing.T) {
 }
 
 func TestPartition(t *testing.T) {
-	PartitionRunner := func(str string) string {
+	runner := func(str string) string {
 		inputs := strings.Split(str, separator)
 		strs := Partition(inputs[0], inputs[1])
 		return sep(strs...)
 	}
 
-	runTestCases(t, PartitionRunner, _M{
+	runTestCases(t, runner, _M{
 		sep("hello", "l"):           sep("he", "l", "lo"),
 		sep("中文总少不了", "少"):          sep("中文总", "少", "不了"),
 		sep("z这个zh英文混排hao不", "h英文"): sep("z这个z", "h英文", "混排hao不"),
@@ -70,13 +70,13 @@ func TestPartition(t *testing.T) {
 }
 
 func TestLastPartition(t *testing.T) {
-	PartitionRunner := func(str string) string {
+	runner := func(str string) string {
 		inputs := strings.Split(str, separator)
 		strs := LastPartition(inputs[0], inputs[1])
 		return sep(strs...)
 	}
 
-	runTestCases(t, PartitionRunner, _M{
+	runTestCases(t, runner, _M{
 		sep("hello", "l"):               sep("hel", "l", "o"),
 		sep("少量中文总少不了", "少"):            sep("少量中文总", "少", "不了"),
 		sep("z这个zh英文ch英文混排hao不", "h英文"): sep("z这个zh英文c", "h英文", "混排hao不"),
@@ -90,7 +90,7 @@ func TestLastPartition(t *testing.T) {
 }
 
 func TestInsert(t *testing.T) {
-	InsertRunner := func(str string) (result string) {
+	runner := func(str string) (result string) {
 		defer func() {
 			if e := recover(); e != nil {
 				result = e.(string)
@@ -103,7 +103,7 @@ func TestInsert(t *testing.T) {
 		return
 	}
 
-	runTestCases(t, InsertRunner, _M{
+	runTestCases(t, runner, _M{
 		sep("abcdefg", "hi", "3"):    "abchidefg",
 		sep("少量中文是必须的", "混pai", "4"): "少量中文混pai是必须的",
 		sep("zh英文hun排", "~！", "5"):   "zh英文h~！un排",
@@ -116,12 +116,12 @@ func TestInsert(t *testing.T) {
 }
 
 func TestScrub(t *testing.T) {
-	ScrubRunner := func(str string) string {
+	runner := func(str string) string {
 		strs := split(str)
 		return Scrub(strs[0], strs[1])
 	}
 
-	runTestCases(t, ScrubRunner, _M{
+	runTestCases(t, runner, _M{
 		sep("ab\uFFFDcd\xFF\xCEefg\xFF\xFC\xFD\xFAhijk", "*"): "ab*cd*efg*hijk",
 		sep("no错误です", "*"):                                    "no错误です",
 		sep("", "*"):                                          "",
@@ -129,11 +129,11 @@ func TestScrub(t *testing.T) {
 }
 
 func TestWordSplit(t *testing.T) {
-	WordSplitRunner := func(str string) string {
+	runner := func(str string) string {
 		return sep(WordSplit(str)...)
 	}
 
-	runTestCases(t, WordSplitRunner, _M{
+	runTestCases(t, runner, _M{
 		"one word":                   sep("one", "word"),
 		"一个字：把他给我拿下！":                "",
 		"it's a super-fancy one!!!a": sep("it's", "a", "super-fancy", "one", "a"),

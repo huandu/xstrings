@@ -9,11 +9,11 @@ import (
 )
 
 func TestLen(t *testing.T) {
-	LenRunner := func(str string) string {
+	runner := func(str string) string {
 		return fmt.Sprint(Len(str))
 	}
 
-	runTestCases(t, LenRunner, _M{
+	runTestCases(t, runner, _M{
 		"abcdef":    "6",
 		"中文":        "2",
 		"中yin文hun排": "9",
@@ -22,11 +22,11 @@ func TestLen(t *testing.T) {
 }
 
 func TestWordCount(t *testing.T) {
-	WordCountRunner := func(str string) string {
+	runner := func(str string) string {
 		return fmt.Sprint(WordCount(str))
 	}
 
-	runTestCases(t, WordCountRunner, _M{
+	runTestCases(t, runner, _M{
 		"one word: λ":             "3",
 		"中文":                      "0",
 		"你好，sekai！":               "1",
