@@ -36,3 +36,15 @@ func TestWordCount(t *testing.T) {
 		"it's-'s": "1",
 	})
 }
+
+func TestWidth(t *testing.T) {
+	runner := func(str string) string {
+		return fmt.Sprint(Width(str))
+	}
+
+	runTestCases(t, runner, _M{
+		"abcd\t0123\n7890": "12",
+		"中zh英eng文混排":       "15",
+		"": "0",
+	})
+}

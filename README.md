@@ -38,10 +38,10 @@ Here is a list of functions in [strings](http://golang.org/pkg/strings) and [xst
 
 ### Package `xstrings` functions ###
 
-*Keep this table sorted by Name in ascending order.*
+*Keep this table sorted by Function in ascending order.*
 
 | Function | Friends | Issue # |
-| ---- | ------- | ------- |
+| -------- | ------- | ------- |
 | [FirstRuneToLower](https://godoc.org/github.com/huandu/xstrings#FirstRuneToLower) | `lcfirst` in PHP or Perl | [#15](https://github.com/huandu/xstrings/issues/15) |
 | [FirstRuneToUpper](https://godoc.org/github.com/huandu/xstrings#FirstRuneToUpper) | `String#capitalize` in Ruby; `ucfirst` in PHP or Perl | [#15](https://github.com/huandu/xstrings/issues/15) |
 | [Insert](https://godoc.org/github.com/huandu/xstrings#Insert) | `String#insert` in Ruby | [#18](https://github.com/huandu/xstrings/issues/18) |
@@ -57,15 +57,16 @@ Here is a list of functions in [strings](http://golang.org/pkg/strings) and [xst
 | [SwapCase](https://godoc.org/github.com/huandu/xstrings#SwapCase) | `str.swapcase` in Python; `String#swapcase` in Ruby | [#12](https://github.com/huandu/xstrings/issues/12) |
 | [ToCamelCase](https://godoc.org/github.com/huandu/xstrings#ToCamelCase) | `String#camalize` in RoR | [#1](https://github.com/huandu/xstrings/issues/1) |
 | [ToSnakeCase](https://godoc.org/github.com/huandu/xstrings#ToSnakeCase) | `String#underscore` in RoR | [#1](https://github.com/huandu/xstrings/issues/1) |
+| [Width](https://godoc.org/github.com/huandu/xstrings#Width) | `mb_strwidth` in PHP | [#26](https://github.com/huandu/xstrings/issues/26) |
 | [WordCount](https://godoc.org/github.com/huandu/xstrings#WordCount) | `str_word_count` in PHP | [#14](https://github.com/huandu/xstrings/issues/14) |
 | [WordSplit](https://godoc.org/github.com/huandu/xstrings#WordSplit) | - | [#14](https://github.com/huandu/xstrings/issues/14) |
 
 ### Package `strings` functions ###
 
-*Keep this table sorted by Name in ascending order.*
+*Keep this table sorted by Function in ascending order.*
 
 | Function | Friends |
-| ---- | ------- |
+| -------- | ------- |
 | [Contains](http://golang.org/pkg/strings/#Contains) | `String#include?` in Ruby |
 | [ContainsAny](http://golang.org/pkg/strings/#ContainsAny) | - |
 | [ContainsRune](http://golang.org/pkg/strings/#ContainsRune) | - |

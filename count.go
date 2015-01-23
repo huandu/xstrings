@@ -74,3 +74,38 @@ func isAlphabet(r rune) bool {
 
 	return true
 }
+
+// Width returns string width in monotype font.
+// Multi-byte characters are usually twice the width of single byte characters.
+//
+// Algorithm comes from `mb_strwidth` in PHP.
+// http://php.net/manual/en/function.mb-strwidth.php
+func Width(str string) int {
+	var r rune
+	var size, n int
+
+	for len(str) > 0 {
+		r, size = utf8.DecodeRuneInString(str)
+
+		switch {
+		case r == utf8.RuneError || r < '\x20':
+			// Such rune's width is 0.
+
+		case '\x20' <= r && r < '\u2000':
+			n++
+
+		case '\u2000' <= r && r < '\uFF61':
+			n += 2
+
+		case '\uFF61' <= r && r < '\uFFA0':
+			n++
+
+		case '\uFFA0' <= r:
+			n += 2
+		}
+
+		str = str[size:]
+	}
+
+	return n
+}
