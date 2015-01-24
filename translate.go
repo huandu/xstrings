@@ -332,7 +332,7 @@ func (tr *Translator) Translate(str string) string {
 
 	// No character is translated.
 	if output == nil {
-		return str
+		return orig
 	}
 
 	return output.String()
@@ -496,4 +496,69 @@ func Count(str, pattern string) int {
 	}
 
 	return cnt
+}
+
+// Squeeze deletes adjacent repeated runes in str.
+// If pattern is not empty, only runes matching the pattern will be squeezed.
+//
+// Samples:
+//     Squeeze("hello", "")    => "helo"
+//     Squeeze("hello", "m-z") => "hello"
+func Squeeze(str, pattern string) string {
+	var last, r rune
+	var size int
+	var skipSqueeze, matched bool
+	var tr *Translator
+	var output *bytes.Buffer
+
+	orig := str
+	last = -1
+
+	if len(pattern) > 0 {
+		tr = NewTranslator(pattern, "")
+	}
+
+	for len(str) > 0 {
+		r, size = utf8.DecodeRuneInString(str)
+
+		// Need to squeeze the str.
+		if last == r && !skipSqueeze {
+			if tr != nil {
+				if _, matched = tr.TranslateRune(r); !matched {
+					skipSqueeze = true
+				}
+			}
+
+			if output == nil {
+				output = &bytes.Buffer{}
+				maxSize := len(str) * 4
+
+				// Avoid to reserve too much memory at once.
+				if maxSize > _TRANSLATE_INIT_GROW_SIZE_MAX {
+					maxSize = _TRANSLATE_INIT_GROW_SIZE_MAX
+				}
+
+				output.Grow(maxSize)
+				output.WriteString(orig[:len(orig)-len(str)])
+			}
+
+			if skipSqueeze {
+				output.WriteRune(r)
+			}
+		} else {
+			if output != nil {
+				output.WriteRune(r)
+			}
+
+			last = r
+		}
+
+		str = str[size:]
+	}
+
+	if output == nil {
+		return orig
+	}
+
+	return output.String()
 }

@@ -22,6 +22,7 @@ func TestTranslate(t *testing.T) {
 		sep("hello", "z-a", "a-z"):        "svool",
 		sep("hello", "aeiou", "*"):        "h*ll*",
 		sep("hello", "^l", "*"):           "**ll*",
+		sep("hello", "p-z", "*"):          "hello",
 		sep("hello ^ world", `\^lo`, "*"): "he*** * w*r*d",
 
 		sep("中文字符测试", "文中谁敢试？", "123456"):  "21字符测5",
@@ -66,5 +67,22 @@ func TestCount(t *testing.T) {
 		sep("hello", "^a-k"):  "3",
 
 		sep("中文字符测试", "文中谁敢试？"): "3",
+	})
+}
+
+func TestSqueeze(t *testing.T) {
+	runner := func(str string) string {
+		inputs := strings.Split(str, separator)
+		return Squeeze(inputs[0], inputs[1])
+	}
+
+	runTestCases(t, runner, _M{
+		sep("hello", ""):     "helo",
+		sep("hello", "a-k"):  "hello",
+		sep("hello", "^a-k"): "helo",
+		sep("hello", "^a-l"): "hello",
+
+		sep("打打打打个劫！！", ""):  "打个劫！",
+		sep("打打打打个劫！！", "打"): "打个劫！！",
 	})
 }
