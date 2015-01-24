@@ -16,6 +16,7 @@ func TestTranslate(t *testing.T) {
 
 	runTestCases(t, runner, _M{
 		sep("hello", "aeiou", "12345"):    "h2ll4",
+		sep("hello", "aeiou", ""):         "hll",
 		sep("hello", "a-z", "A-Z"):        "HELLO",
 		sep("hello", "z-a", "a-z"):        "svool",
 		sep("hello", "aeiou", "*"):        "h*ll*",
@@ -34,5 +35,20 @@ func TestTranslate(t *testing.T) {
 		sep("hello", "-e-", "p"):       "hpllo",
 		sep("hello", "----e---", "p"):  "hpllo",
 		sep("hello", "^---e----", "p"): "peppp",
+	})
+}
+
+func TestDelete(t *testing.T) {
+	runner := func(str string) string {
+		inputs := strings.Split(str, separator)
+		return Delete(inputs[0], inputs[1])
+	}
+
+	runTestCases(t, runner, _M{
+		sep("hello", "aeiou"): "hll",
+		sep("hello", "a-k"):   "llo",
+		sep("hello", "^a-k"):  "he",
+
+		sep("中文字符测试", "文中谁敢试？"): "字符测",
 	})
 }

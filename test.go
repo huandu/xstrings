@@ -19,7 +19,7 @@ func runTestCases(t *testing.T, converter func(string) string, cases map[string]
 		s := converter(k)
 
 		if s != v {
-			t.Fatalf("case fails. [expected:%v] [actual:%v] [source:%v]", v, s, k)
+			t.Fatalf("case fails. [case:%v]\nshould => %#v\nactual => %#v", k, v, s)
 		}
 	}
 }

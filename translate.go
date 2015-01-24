@@ -28,12 +28,12 @@ type runeMap map[rune]rune
 // If a from/to pattern pair needs to be used more than once, it's recommended
 // to create a Translator and reuse it.
 type Translator struct {
-	quickDict *runeDict       // A quick dictionary to look up rune by index. Only availabe for latin runes.
-	runeMap   runeMap         // Rune map for translation.
-	ranges    []*runeRangeMap // Ranges of runes.
-	error     rune            // Decides how to translate RuneError.
-	reverted  bool            // If to pattern is empty, all matched characters will be deleted.
-	enabled   bool
+	quickDict  *runeDict       // A quick dictionary to look up rune by index. Only availabe for latin runes.
+	runeMap    runeMap         // Rune map for translation.
+	ranges     []*runeRangeMap // Ranges of runes.
+	mappedRune rune            // If mappedRune >= 0, all matched runes are translated to the mappedRune.
+	reverted   bool            // If to pattern is empty, all matched characters will be deleted.
+	hasPattern bool
 }
 
 // NewTranslator creates new Translator through a from/to pattern pair.
@@ -76,18 +76,23 @@ func NewTranslator(from, to string) *Translator {
 		}
 	}
 
-	// If from pattern is reverted, only the last rune in the to pattern will be used.
-	if reverted {
-		var size int
-
-		for len(to) > 0 {
-			toStart, size = utf8.DecodeRuneInString(to)
-			to = to[size:]
-		}
-
+	if deletion {
+		toStart = utf8.RuneError
 		toEnd = utf8.RuneError
 	} else {
-		to, toStart, toEnd, toRangeStep = nextRuneRange(to, utf8.RuneError)
+		// If from pattern is reverted, only the last rune in the to pattern will be used.
+		if reverted {
+			var size int
+
+			for len(to) > 0 {
+				toStart, size = utf8.DecodeRuneInString(to)
+				to = to[size:]
+			}
+
+			toEnd = utf8.RuneError
+		} else {
+			to, toStart, toEnd, toRangeStep = nextRuneRange(to, utf8.RuneError)
+		}
 	}
 
 	fromEnd = utf8.RuneError
@@ -150,12 +155,12 @@ func NewTranslator(from, to string) *Translator {
 	}
 
 	tr.reverted = reverted
-	tr.error = -1
-	tr.enabled = true
+	tr.mappedRune = -1
+	tr.hasPattern = true
 
 	// Translate RuneError only if in deletion or reverted mode.
 	if deletion || reverted {
-		tr.error = toStart
+		tr.mappedRune = toStart
 	}
 
 	return tr
@@ -282,75 +287,21 @@ func nextRuneRange(str string, last rune) (remaining string, start, end rune, ra
 //
 // See comment in Translate function for usage and samples.
 func (tr *Translator) Translate(str string) string {
-	if !tr.enabled || str == "" {
+	if !tr.hasPattern || str == "" {
 		return str
 	}
 
-	var r, to, mapped rune
-	var i, size int
-	var ok, needTr bool
-	var rrm *runeRangeMap
+	var r rune
+	var size int
+	var needTr bool
 
 	orig := str
-	quickDict := tr.quickDict
-	runeMap := tr.runeMap
-	ranges := tr.ranges
-	reverted := tr.reverted
-	error := tr.error
 
 	var output *bytes.Buffer
 
 	for len(str) > 0 {
 		r, size = utf8.DecodeRuneInString(str)
-		to = -1
-
-		switch {
-		case r == utf8.RuneError:
-			to = error
-
-		default:
-			if quickDict != nil {
-				if r <= unicode.MaxASCII {
-					mapped = quickDict.Dict[r]
-
-					if mapped != 0 {
-						to = mapped
-						break
-					}
-				}
-			}
-
-			if mapped, ok = runeMap[r]; ok {
-				to = mapped
-				break
-			}
-
-			for i = len(ranges) - 1; i >= 0; i-- {
-				rrm = ranges[i]
-
-				if rrm.FromLo <= r && r <= rrm.FromHi {
-					if rrm.ToLo < rrm.ToHi {
-						to = rrm.ToLo + r - rrm.FromLo
-					} else if rrm.ToLo > rrm.ToHi {
-						// ToHi can be smaller than ToLo if range is from higher to lower.
-						to = rrm.ToLo - r + rrm.FromLo
-					} else {
-						to = rrm.ToLo
-					}
-
-					break
-				}
-			}
-		}
-
-		needTr = to >= 0
-
-		// If reverted, all matched runes including RuneError are translated to one rune.
-		// This special rune is stored in error currently.
-		if reverted {
-			needTr = !needTr
-			to = error
-		}
+		r, needTr = tr.TranslateRune(r)
 
 		// No need to translate.
 		if needTr {
@@ -367,11 +318,11 @@ func (tr *Translator) Translate(str string) string {
 				output.WriteString(orig[:len(orig)-len(str)])
 			}
 
-			if to != utf8.RuneError {
-				output.WriteRune(to)
+			if r != utf8.RuneError {
+				output.WriteRune(r)
 			}
 		} else {
-			if output != nil {
+			if r != utf8.RuneError && output != nil {
 				output.WriteRune(r)
 			}
 		}
@@ -385,6 +336,86 @@ func (tr *Translator) Translate(str string) string {
 	}
 
 	return output.String()
+}
+
+// TranslateRune return translated rune and true if r matches the from pattern.
+// If r doesn't match the pattern, original r is returned and translated is false.
+func (tr *Translator) TranslateRune(r rune) (result rune, translated bool) {
+	switch {
+	case tr.quickDict != nil:
+		if r <= unicode.MaxASCII {
+			result = tr.quickDict.Dict[r]
+
+			if result != 0 {
+				translated = true
+
+				if tr.mappedRune >= 0 {
+					result = tr.mappedRune
+				}
+
+				break
+			}
+		}
+
+		fallthrough
+
+	case tr.runeMap != nil:
+		var ok bool
+
+		if result, ok = tr.runeMap[r]; ok {
+			translated = true
+
+			if tr.mappedRune >= 0 {
+				result = tr.mappedRune
+			}
+
+			break
+		}
+
+		fallthrough
+
+	default:
+		var rrm *runeRangeMap
+		ranges := tr.ranges
+
+		for i := len(ranges) - 1; i >= 0; i-- {
+			rrm = ranges[i]
+
+			if rrm.FromLo <= r && r <= rrm.FromHi {
+				translated = true
+
+				if tr.mappedRune >= 0 {
+					result = tr.mappedRune
+					break
+				}
+
+				if rrm.ToLo < rrm.ToHi {
+					result = rrm.ToLo + r - rrm.FromLo
+				} else if rrm.ToLo > rrm.ToHi {
+					// ToHi can be smaller than ToLo if range is from higher to lower.
+					result = rrm.ToLo - r + rrm.FromLo
+				} else {
+					result = rrm.ToLo
+				}
+
+				break
+			}
+		}
+	}
+
+	if tr.reverted {
+		if !translated {
+			result = tr.mappedRune
+		}
+
+		translated = !translated
+	}
+
+	if !translated {
+		result = r
+	}
+
+	return
 }
 
 // Translate str with the characters defined in from replaced by characters defined in to.
@@ -405,6 +436,8 @@ func (tr *Translator) Translate(str string) string {
 //
 // Note that '^' only works in the from pattern. It will be considered as a normal character in the to pattern.
 //
+// If the to pattern is an empty string, Translate works exactly the same as Delete.
+//
 // Samples:
 //     Translate("hello", "aeiou", "12345")    => "h2ll4"
 //     Translate("hello", "a-z", "A-Z")        => "HELLO"
@@ -414,5 +447,17 @@ func (tr *Translator) Translate(str string) string {
 //     Translate("hello ^ world", `\^lo`, "*") => "he*** * w*r*d"
 func Translate(str, from, to string) string {
 	tr := NewTranslator(from, to)
+	return tr.Translate(str)
+}
+
+// Delete runes in str matching the pattern.
+// Pattern is defined in Translate.
+//
+// Samples:
+//     Delete("hello", "aeiou") => "hll"
+//     Delete("hello", "a-k")   => "llo"
+//     Delete("hello", "^a-k")  => "he"
+func Delete(str, pattern string) string {
+	tr := NewTranslator(pattern, "")
 	return tr.Translate(str)
 }
