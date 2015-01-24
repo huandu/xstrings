@@ -68,3 +68,47 @@ func ExpandTabs(str string, tabSize int) string {
 
 	return output.String()
 }
+
+// LeftJustify returns a string with pad string at right side if str's rune length is smaller than length.
+// If str's rune length is larger than length, str itself will be returned.
+//
+// If pad is an empty string, str will be returned.
+//
+// Samples:
+//     LeftJustify("hello", 4, " ")    => "hello"
+//     LeftJustify("hello", 10, " ")   => "hello     "
+//     LeftJustify("hello", 10, "123") => "hello12312"
+func LeftJustify(str string, length int, pad string) string {
+	l := Len(str)
+
+	if l >= length || pad == "" {
+		return str
+	}
+
+	var r rune
+	var size int
+
+	paddingLen := Len(pad)
+	remains := length - l
+	repeats := remains / paddingLen
+
+	output := &bytes.Buffer{}
+	output.Grow(len(str) + (repeats+1)*len(pad))
+	output.WriteString(str)
+
+	for i := 0; i < repeats; i++ {
+		output.WriteString(pad)
+	}
+
+	remains = remains % paddingLen
+
+	if remains != 0 {
+		for i := 0; i < remains; i++ {
+			r, size = utf8.DecodeRuneInString(pad)
+			output.WriteRune(r)
+			pad = pad[size:]
+		}
+	}
+
+	return output.String()
+}
