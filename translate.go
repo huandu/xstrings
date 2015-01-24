@@ -418,6 +418,11 @@ func (tr *Translator) TranslateRune(r rune) (result rune, translated bool) {
 	return
 }
 
+// HasPattern returns true if Translator has one pattern at least.
+func (tr *Translator) HasPattern() bool {
+	return tr.hasPattern
+}
+
 // Translate str with the characters defined in from replaced by characters defined in to.
 //
 // From and to are patterns representing a set of characters. Pattern is defined as following.
@@ -451,7 +456,7 @@ func Translate(str, from, to string) string {
 }
 
 // Delete runes in str matching the pattern.
-// Pattern is defined in Translate.
+// Pattern is defined in Translate function.
 //
 // Samples:
 //     Delete("hello", "aeiou") => "hll"
@@ -460,4 +465,35 @@ func Translate(str, from, to string) string {
 func Delete(str, pattern string) string {
 	tr := NewTranslator(pattern, "")
 	return tr.Translate(str)
+}
+
+// Count how many runes in str match the pattern.
+// Pattern is defined in Translate function.
+//
+// Samples:
+//     Count("hello", "aeiou") => 3
+//     Count("hello", "a-k")   => 3
+//     Count("hello", "^a-k")  => 2
+func Count(str, pattern string) int {
+	if pattern == "" || str == "" {
+		return 0
+	}
+
+	var r rune
+	var size int
+	var matched bool
+
+	tr := NewTranslator(pattern, "")
+	cnt := 0
+
+	for len(str) > 0 {
+		r, size = utf8.DecodeRuneInString(str)
+		str = str[size:]
+
+		if _, matched = tr.TranslateRune(r); matched {
+			cnt++
+		}
+	}
+
+	return cnt
 }

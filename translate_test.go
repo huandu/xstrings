@@ -4,6 +4,7 @@
 package xstrings
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -50,5 +51,20 @@ func TestDelete(t *testing.T) {
 		sep("hello", "^a-k"):  "he",
 
 		sep("中文字符测试", "文中谁敢试？"): "字符测",
+	})
+}
+
+func TestCount(t *testing.T) {
+	runner := func(str string) string {
+		inputs := strings.Split(str, separator)
+		return fmt.Sprint(Count(inputs[0], inputs[1]))
+	}
+
+	runTestCases(t, runner, _M{
+		sep("hello", "aeiou"): "2",
+		sep("hello", "a-k"):   "2",
+		sep("hello", "^a-k"):  "3",
+
+		sep("中文字符测试", "文中谁敢试？"): "3",
 	})
 }
