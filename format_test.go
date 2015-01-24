@@ -77,3 +77,24 @@ func TestRightJustify(t *testing.T) {
 		sep("hello中文test", "18", ""):   "hello中文test",
 	})
 }
+
+func TestCenter(t *testing.T) {
+	runner := func(str string) string {
+		input := strings.Split(str, separator)
+		n, _ := strconv.Atoi(input[1])
+		return Center(input[0], n, input[2])
+	}
+
+	runTestCases(t, runner, _M{
+		sep("hello", "4", " "):    "hello",
+		sep("hello", "10", " "):   "  hello   ",
+		sep("hello", "10", "123"): "12hello123",
+
+		sep("hello中文test", "4", " "):    "hello中文test",
+		sep("hello中文test", "12", " "):   "hello中文test ",
+		sep("hello中文test", "18", "测试！"): "测试！hello中文test测试！测",
+
+		sep("hello中文test", "0", "123"): "hello中文test",
+		sep("hello中文test", "18", ""):   "hello中文test",
+	})
+}

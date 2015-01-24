@@ -42,6 +42,7 @@ Here is a list of functions in [strings](http://golang.org/pkg/strings) and [xst
 
 | Function | Friends | Issue # |
 | -------- | ------- | ------- |
+| [Center](https://godoc.org/github.com/huandu/xstrings#Center) | `str.center` in Python; `String#center` in Ruby | [#30](https://github.com/huandu/xstrings/issues/30) |
 | [Count](https://godoc.org/github.com/huandu/xstrings#Count) | `String#count` in Ruby | [#16](https://github.com/huandu/xstrings/issues/16) |
 | [Delete](https://godoc.org/github.com/huandu/xstrings#Delete) | `String#delete` in Ruby | [#17](https://github.com/huandu/xstrings/issues/17) |
 | [ExpandTabs](https://godoc.org/github.com/huandu/xstrings#ExpandTabs) | `str.expandtabs` in Python | [#27](https://github.com/huandu/xstrings/issues/27) |

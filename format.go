@@ -85,31 +85,13 @@ func LeftJustify(str string, length int, pad string) string {
 		return str
 	}
 
-	var r rune
-	var size int
-
-	paddingLen := Len(pad)
 	remains := length - l
-	repeats := remains / paddingLen
+	padLen := Len(pad)
 
 	output := &bytes.Buffer{}
-	output.Grow(len(str) + (repeats+1)*len(pad))
+	output.Grow(len(str) + (remains/padLen+1)*len(pad))
 	output.WriteString(str)
-
-	for i := 0; i < repeats; i++ {
-		output.WriteString(pad)
-	}
-
-	remains = remains % paddingLen
-
-	if remains != 0 {
-		for i := 0; i < remains; i++ {
-			r, size = utf8.DecodeRuneInString(pad)
-			output.WriteRune(r)
-			pad = pad[size:]
-		}
-	}
-
+	writePadString(output, pad, padLen, remains)
 	return output.String()
 }
 
@@ -119,9 +101,9 @@ func LeftJustify(str string, length int, pad string) string {
 // If pad is an empty string, str will be returned.
 //
 // Samples:
-//     LeftJustify("hello", 4, " ")    => "hello"
-//     LeftJustify("hello", 10, " ")   => "     hello"
-//     LeftJustify("hello", 10, "123") => "12312hello"
+//     RightJustify("hello", 4, " ")    => "hello"
+//     RightJustify("hello", 10, " ")   => "     hello"
+//     RightJustify("hello", 10, "123") => "12312hello"
 func RightJustify(str string, length int, pad string) string {
 	l := Len(str)
 
@@ -129,21 +111,54 @@ func RightJustify(str string, length int, pad string) string {
 		return str
 	}
 
+	remains := length - l
+	padLen := Len(pad)
+
+	output := &bytes.Buffer{}
+	output.Grow(len(str) + (remains/padLen+1)*len(pad))
+	writePadString(output, pad, padLen, remains)
+	output.WriteString(str)
+	return output.String()
+}
+
+// Center returns a string with pad string at both side if str's rune length is smaller than length.
+// If str's rune length is larger than length, str itself will be returned.
+//
+// If pad is an empty string, str will be returned.
+//
+// Samples:
+//     Center("hello", 4, " ")    => "hello"
+//     Center("hello", 10, " ")   => "  hello   "
+//     Center("hello", 10, "123") => "12hello123"
+func Center(str string, length int, pad string) string {
+	l := Len(str)
+
+	if l >= length || pad == "" {
+		return str
+	}
+
+	remains := length - l
+	padLen := Len(pad)
+
+	output := &bytes.Buffer{}
+	output.Grow(len(str) + (remains/padLen+1)*len(pad))
+	writePadString(output, pad, padLen, remains/2)
+	output.WriteString(str)
+	writePadString(output, pad, padLen, (remains+1)/2)
+	return output.String()
+}
+
+func writePadString(output *bytes.Buffer, pad string, padLen, remains int) {
 	var r rune
 	var size int
 
-	paddingLen := Len(pad)
-	remains := length - l
-	repeats := remains / paddingLen
-
-	output := &bytes.Buffer{}
-	output.Grow(len(str) + (repeats+1)*len(pad))
+	repeats := remains / padLen
 
 	for i := 0; i < repeats; i++ {
 		output.WriteString(pad)
 	}
 
-	remains = remains % paddingLen
+	remains = remains % padLen
 
 	if remains != 0 {
 		for i := 0; i < remains; i++ {
@@ -152,7 +167,4 @@ func RightJustify(str string, length int, pad string) string {
 			pad = pad[size:]
 		}
 	}
-
-	output.WriteString(str)
-	return output.String()
 }
