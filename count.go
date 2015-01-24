@@ -86,26 +86,35 @@ func Width(str string) int {
 
 	for len(str) > 0 {
 		r, size = utf8.DecodeRuneInString(str)
-
-		switch {
-		case r == utf8.RuneError || r < '\x20':
-			// Such rune's width is 0.
-
-		case '\x20' <= r && r < '\u2000':
-			n++
-
-		case '\u2000' <= r && r < '\uFF61':
-			n += 2
-
-		case '\uFF61' <= r && r < '\uFFA0':
-			n++
-
-		case '\uFFA0' <= r:
-			n += 2
-		}
-
+		n += RuneWidth(r)
 		str = str[size:]
 	}
 
 	return n
+}
+
+// RuneWidth returns character width in monotype font.
+// Multi-byte characters are usually twice the width of single byte characters.
+//
+// Algorithm comes from `mb_strwidth` in PHP.
+// http://php.net/manual/en/function.mb-strwidth.php
+func RuneWidth(r rune) int {
+	switch {
+	case r == utf8.RuneError || r < '\x20':
+		return 0
+
+	case '\x20' <= r && r < '\u2000':
+		return 1
+
+	case '\u2000' <= r && r < '\uFF61':
+		return 2
+
+	case '\uFF61' <= r && r < '\uFFA0':
+		return 1
+
+	case '\uFFA0' <= r:
+		return 2
+	}
+
+	return 0
 }

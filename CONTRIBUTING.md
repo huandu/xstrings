@@ -1,6 +1,8 @@
+# Contributing #
+
 Thanks for your contribution in advance. No matter what you will contribute to this project, pull request or bug report or feature discussion, it's always highly appreciated.
 
-If you want to submit anything other than adding a new feature/function to this package, feel free to do it. You just need remember to use `go fmt` to format your code and write sufficient test cases for new code.
+## New API or feature ##
 
 I want to speak more about how to add new functions to this package.
 
@@ -13,3 +15,9 @@ Package `xstring` is a collection of useful string functions which should be imp
 * Rule 5: If a function is quite useful in some famous framework or library, it can be included.
 
 New function must be discussed in project issues before submitting any code. If a pull request with new functions is sent without any ref issue, it will be rejected.
+
+## Pull request ##
+
+Pull request is always welcome. Just make sure you have run `go fmt` and all test cases passed before submit.
+
+If the pull request is to add a new API or feature, don't forget to update README.md and add new API in function list.

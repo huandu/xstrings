@@ -51,8 +51,8 @@ func TestSlice(t *testing.T) {
 
 func TestPartition(t *testing.T) {
 	runner := func(str string) string {
-		inputs := strings.Split(str, separator)
-		strs := Partition(inputs[0], inputs[1])
+		input := strings.Split(str, separator)
+		strs := Partition(input[0], input[1])
 		return sep(strs...)
 	}
 
@@ -71,8 +71,8 @@ func TestPartition(t *testing.T) {
 
 func TestLastPartition(t *testing.T) {
 	runner := func(str string) string {
-		inputs := strings.Split(str, separator)
-		strs := LastPartition(inputs[0], inputs[1])
+		input := strings.Split(str, separator)
+		strs := LastPartition(input[0], input[1])
 		return sep(strs...)
 	}
 

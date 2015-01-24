@@ -48,3 +48,15 @@ func TestWidth(t *testing.T) {
 		"": "0",
 	})
 }
+
+func TestRuneWidth(t *testing.T) {
+	runner := func(str string) string {
+		return fmt.Sprint(RuneWidth([]rune(str)[0]))
+	}
+
+	runTestCases(t, runner, _M{
+		"a":    "1",
+		"中":    "2",
+		"\x11": "0",
+	})
+}

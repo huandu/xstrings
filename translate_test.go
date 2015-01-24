@@ -11,8 +11,8 @@ import (
 
 func TestTranslate(t *testing.T) {
 	runner := func(str string) string {
-		inputs := strings.Split(str, separator)
-		return Translate(inputs[0], inputs[1], inputs[2])
+		input := strings.Split(str, separator)
+		return Translate(input[0], input[1], input[2])
 	}
 
 	runTestCases(t, runner, _M{
@@ -42,8 +42,8 @@ func TestTranslate(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	runner := func(str string) string {
-		inputs := strings.Split(str, separator)
-		return Delete(inputs[0], inputs[1])
+		input := strings.Split(str, separator)
+		return Delete(input[0], input[1])
 	}
 
 	runTestCases(t, runner, _M{
@@ -57,8 +57,8 @@ func TestDelete(t *testing.T) {
 
 func TestCount(t *testing.T) {
 	runner := func(str string) string {
-		inputs := strings.Split(str, separator)
-		return fmt.Sprint(Count(inputs[0], inputs[1]))
+		input := strings.Split(str, separator)
+		return fmt.Sprint(Count(input[0], input[1]))
 	}
 
 	runTestCases(t, runner, _M{
@@ -72,8 +72,8 @@ func TestCount(t *testing.T) {
 
 func TestSqueeze(t *testing.T) {
 	runner := func(str string) string {
-		inputs := strings.Split(str, separator)
-		return Squeeze(inputs[0], inputs[1])
+		input := strings.Split(str, separator)
+		return Squeeze(input[0], input[1])
 	}
 
 	runTestCases(t, runner, _M{

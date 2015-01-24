@@ -9,8 +9,6 @@ import (
 	"unicode/utf8"
 )
 
-const _TRANSLATE_INIT_GROW_SIZE_MAX = 2048
-
 type runeRangeMap struct {
 	FromLo rune // Lower bound of range map.
 	FromHi rune // An inclusive higher bound of range map.
@@ -306,16 +304,7 @@ func (tr *Translator) Translate(str string) string {
 		// No need to translate.
 		if needTr {
 			if output == nil {
-				output = &bytes.Buffer{}
-				maxSize := len(str) * 4
-
-				// Avoid to reserve too much memory at once.
-				if maxSize > _TRANSLATE_INIT_GROW_SIZE_MAX {
-					maxSize = _TRANSLATE_INIT_GROW_SIZE_MAX
-				}
-
-				output.Grow(maxSize)
-				output.WriteString(orig[:len(orig)-len(str)])
+				output = allocBuffer(orig, str)
 			}
 
 			if r != utf8.RuneError {
@@ -530,16 +519,7 @@ func Squeeze(str, pattern string) string {
 			}
 
 			if output == nil {
-				output = &bytes.Buffer{}
-				maxSize := len(str) * 4
-
-				// Avoid to reserve too much memory at once.
-				if maxSize > _TRANSLATE_INIT_GROW_SIZE_MAX {
-					maxSize = _TRANSLATE_INIT_GROW_SIZE_MAX
-				}
-
-				output.Grow(maxSize)
-				output.WriteString(orig[:len(orig)-len(str)])
+				output = allocBuffer(orig, str)
 			}
 
 			if skipSqueeze {
