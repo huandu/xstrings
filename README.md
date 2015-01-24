@@ -3,9 +3,11 @@
 [![Build Status](https://travis-ci.org/huandu/xstrings.png?branch=master)](https://travis-ci.org/huandu/xstrings)
 [![GoDoc](https://godoc.org/github.com/huandu/xstrings?status.svg)](https://godoc.org/github.com/huandu/xstrings)
 
-Go package [xstrings](https://godoc.org/github.com/huandu/xstrings) is a collection of useful string functions, which are built-in or widely used in other languages but absent in Go package [strings](http://golang.org/pkg/strings). All functions are well tested.
+Go package [xstrings](https://godoc.org/github.com/huandu/xstrings) is a collection of string functions, which are widely used in other languages but absent in Go package [strings](http://golang.org/pkg/strings).
 
-Need even more string functions? No problem!
+All functions are well tested and carefully tuned for performance.
+
+## Propose a new function ##
 
 Please review [contributing guideline](CONTRIBUTING.md) and [create new issue](https://github.com/huandu/xstrings/issues) to state why it should be included.
 
@@ -14,17 +16,6 @@ Please review [contributing guideline](CONTRIBUTING.md) and [create new issue](h
 Use `go get` to install this library.
 
 	go get github.com/huandu/xstrings
-
-After installation, this package can be used in Go program as following.
-
-	package main
-
-	import "github.com/huandu/xstrings"
-	import "fmt"
-
-	func main() {
-		fmt.Println(xstrings.ToSnakeCase("HelloWorld")) // Prints: hello_world
-	}
 
 ## API document ##
 
@@ -40,8 +31,8 @@ Here is a list of functions in [strings](http://golang.org/pkg/strings) and [xst
 
 *Keep this table sorted by Function in ascending order.*
 
-| Function | Friends | Issue # |
-| -------- | ------- | ------- |
+| Function | Friends | # |
+| -------- | ------- | --- |
 | [Center](https://godoc.org/github.com/huandu/xstrings#Center) | `str.center` in Python; `String#center` in Ruby | [#30](https://github.com/huandu/xstrings/issues/30) |
 | [Count](https://godoc.org/github.com/huandu/xstrings#Count) | `String#count` in Ruby | [#16](https://github.com/huandu/xstrings/issues/16) |
 | [Delete](https://godoc.org/github.com/huandu/xstrings#Delete) | `String#delete` in Ruby | [#17](https://github.com/huandu/xstrings/issues/17) |
