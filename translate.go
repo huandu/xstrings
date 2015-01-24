@@ -1,0 +1,418 @@
+// Copyright 2015 Huan Du. All rights reserved.
+// Licensed under the MIT license that can be found in the LICENSE file.
+
+package xstrings
+
+import (
+	"bytes"
+	"unicode"
+	"unicode/utf8"
+)
+
+const _TRANSLATE_INIT_GROW_SIZE_MAX = 2048
+
+type runeRangeMap struct {
+	FromLo rune // Lower bound of range map.
+	FromHi rune // An inclusive higher bound of range map.
+	ToLo   rune
+	ToHi   rune
+}
+
+type runeDict struct {
+	Dict [unicode.MaxASCII + 1]rune
+}
+
+type runeMap map[rune]rune
+
+// Translator can translate string with pre-compiled from and to patterns.
+// If a from/to pattern pair needs to be used more than once, it's recommended
+// to create a Translator and reuse it.
+type Translator struct {
+	quickDict *runeDict       // A quick dictionary to look up rune by index. Only availabe for latin runes.
+	runeMap   runeMap         // Rune map for translation.
+	ranges    []*runeRangeMap // Ranges of runes.
+	error     rune            // Decides how to translate RuneError.
+	reverted  bool            // If to pattern is empty, all matched characters will be deleted.
+	enabled   bool
+}
+
+// NewTranslator creates new Translator through a from/to pattern pair.
+func NewTranslator(from, to string) *Translator {
+	tr := &Translator{}
+
+	if from == "" {
+		return tr
+	}
+
+	reverted := from[0] == '^'
+	deletion := len(to) == 0
+
+	if reverted {
+		from = from[1:]
+	}
+
+	var fromStart, fromEnd, fromRangeStep rune
+	var toStart, toEnd, toRangeStep rune
+	var fromRangeSize, toRangeSize rune
+	var singleRunes []rune
+
+	updateRange := func() {
+		// Update the to rune range.
+		if toEnd != utf8.RuneError {
+			if toRangeStep == 0 {
+				to, toStart, toEnd, toRangeStep = nextRuneRange(to, toEnd)
+			} else {
+				if toStart == toEnd {
+					if len(to) > 0 {
+						to, toStart, toEnd, toRangeStep = nextRuneRange(to, utf8.RuneError)
+					} else {
+						// Repeat last rune.
+						toEnd = utf8.RuneError
+					}
+				} else {
+					toStart += toRangeStep
+				}
+			}
+		}
+	}
+
+	// If from pattern is reverted, only the last rune in the to pattern will be used.
+	if reverted {
+		var size int
+
+		for len(to) > 0 {
+			toStart, size = utf8.DecodeRuneInString(to)
+			to = to[size:]
+		}
+
+		toEnd = utf8.RuneError
+	} else {
+		to, toStart, toEnd, toRangeStep = nextRuneRange(to, utf8.RuneError)
+	}
+
+	fromEnd = utf8.RuneError
+
+	for len(from) > 0 {
+		from, fromStart, fromEnd, fromRangeStep = nextRuneRange(from, fromEnd)
+
+		// fromStart is a single character. Just map it with a rune in the to pattern.
+		if fromRangeStep == 0 {
+			singleRunes = tr.addRune(fromStart, toStart, singleRunes)
+			updateRange()
+			continue
+		}
+
+		for toEnd != utf8.RuneError && fromStart != fromEnd {
+			// If mapped rune is a single character instead of a range, simply shift first
+			// rune in the range.
+			if toRangeStep == 0 {
+				singleRunes = tr.addRune(fromStart, toStart, singleRunes)
+				updateRange()
+				fromStart += fromRangeStep
+				continue
+			}
+
+			fromRangeSize = (fromEnd - fromStart) * fromRangeStep
+			toRangeSize = (toEnd - toStart) * toRangeStep
+
+			// Not enough runes in the to pattern. Need to read more.
+			if fromRangeSize > toRangeSize {
+				fromStart, toStart = tr.addRuneRange(fromStart, fromStart+toRangeSize*fromRangeStep, toStart, toEnd, singleRunes)
+				fromStart += fromRangeStep
+				updateRange()
+
+				// Edge case: If fromRangeSize == toRangeSize + 1, the last fromStart value needs be considered
+				// as a single rune.
+				if fromStart == fromEnd {
+					singleRunes = tr.addRune(fromStart, toStart, singleRunes)
+					updateRange()
+				}
+
+				continue
+			}
+
+			fromStart, toStart = tr.addRuneRange(fromStart, fromEnd, toStart, toStart+fromRangeSize*toRangeStep, singleRunes)
+			updateRange()
+			break
+		}
+
+		if fromStart == fromEnd {
+			fromEnd = utf8.RuneError
+			continue
+		}
+
+		fromStart, toStart = tr.addRuneRange(fromStart, fromEnd, toStart, toStart, singleRunes)
+		fromEnd = utf8.RuneError
+	}
+
+	if fromEnd != utf8.RuneError {
+		singleRunes = tr.addRune(fromEnd, toStart, singleRunes)
+	}
+
+	tr.reverted = reverted
+	tr.error = -1
+	tr.enabled = true
+
+	// Translate RuneError only if in deletion or reverted mode.
+	if deletion || reverted {
+		tr.error = toStart
+	}
+
+	return tr
+}
+
+func (tr *Translator) addRune(from, to rune, singleRunes []rune) []rune {
+	if from <= unicode.MaxASCII {
+		if tr.quickDict == nil {
+			tr.quickDict = &runeDict{}
+		}
+
+		tr.quickDict.Dict[from] = to
+	} else {
+		if tr.runeMap == nil {
+			tr.runeMap = make(runeMap)
+		}
+
+		tr.runeMap[from] = to
+	}
+
+	singleRunes = append(singleRunes, from)
+	return singleRunes
+}
+
+func (tr *Translator) addRuneRange(fromLo, fromHi, toLo, toHi rune, singleRunes []rune) (rune, rune) {
+	var r rune
+	var rrm *runeRangeMap
+
+	if fromLo < fromHi {
+		rrm = &runeRangeMap{
+			FromLo: fromLo,
+			FromHi: fromHi,
+			ToLo:   toLo,
+			ToHi:   toHi,
+		}
+	} else {
+		rrm = &runeRangeMap{
+			FromLo: fromHi,
+			FromHi: fromLo,
+			ToLo:   toHi,
+			ToHi:   toLo,
+		}
+	}
+
+	// If there is any single rune conflicts with this rune range, clear single rune record.
+	for _, r = range singleRunes {
+		if rrm.FromLo <= r && r <= rrm.FromHi {
+			if r <= unicode.MaxASCII {
+				tr.quickDict.Dict[r] = 0
+			} else {
+				delete(tr.runeMap, r)
+			}
+		}
+	}
+
+	tr.ranges = append(tr.ranges, rrm)
+	return fromHi, toHi
+}
+
+func nextRuneRange(str string, last rune) (remaining string, start, end rune, rangeStep rune) {
+	var r rune
+	var size int
+
+	remaining = str
+	escaping := false
+	isRange := false
+
+	for len(remaining) > 0 {
+		r, size = utf8.DecodeRuneInString(remaining)
+		remaining = remaining[size:]
+
+		// Parse special characters.
+		if !escaping {
+			if r == '\\' {
+				escaping = true
+				continue
+			}
+
+			if r == '-' {
+				// Ignore slash at beginning of string.
+				if last == utf8.RuneError {
+					continue
+				}
+
+				start = last
+				isRange = true
+				continue
+			}
+		}
+
+		escaping = false
+
+		if last != utf8.RuneError {
+			// This is a range which start and end are the same.
+			// Considier it as a normal character.
+			if isRange && last == r {
+				isRange = false
+				continue
+			}
+
+			start = last
+			end = r
+
+			if isRange {
+				if start < end {
+					rangeStep = 1
+				} else {
+					rangeStep = -1
+				}
+			}
+
+			return
+		}
+
+		last = r
+	}
+
+	start = last
+	end = utf8.RuneError
+	return
+}
+
+// Translate str with a from/to pattern pair.
+//
+// See comment in Translate function for usage and samples.
+func (tr *Translator) Translate(str string) string {
+	if !tr.enabled || str == "" {
+		return str
+	}
+
+	var r, to, mapped rune
+	var i, size int
+	var ok, needTr bool
+	var rrm *runeRangeMap
+
+	orig := str
+	quickDict := tr.quickDict
+	runeMap := tr.runeMap
+	ranges := tr.ranges
+	reverted := tr.reverted
+	error := tr.error
+
+	var output *bytes.Buffer
+
+	for len(str) > 0 {
+		r, size = utf8.DecodeRuneInString(str)
+		to = -1
+
+		switch {
+		case r == utf8.RuneError:
+			to = error
+
+		default:
+			if quickDict != nil {
+				if r <= unicode.MaxASCII {
+					mapped = quickDict.Dict[r]
+
+					if mapped != 0 {
+						to = mapped
+						break
+					}
+				}
+			}
+
+			if mapped, ok = runeMap[r]; ok {
+				to = mapped
+				break
+			}
+
+			for i = len(ranges) - 1; i >= 0; i-- {
+				rrm = ranges[i]
+
+				if rrm.FromLo <= r && r <= rrm.FromHi {
+					if rrm.ToLo < rrm.ToHi {
+						to = rrm.ToLo + r - rrm.FromLo
+					} else if rrm.ToLo > rrm.ToHi {
+						// ToHi can be smaller than ToLo if range is from higher to lower.
+						to = rrm.ToLo - r + rrm.FromLo
+					} else {
+						to = rrm.ToLo
+					}
+
+					break
+				}
+			}
+		}
+
+		needTr = to >= 0
+
+		// If reverted, all matched runes including RuneError are translated to one rune.
+		// This special rune is stored in error currently.
+		if reverted {
+			needTr = !needTr
+			to = error
+		}
+
+		// No need to translate.
+		if needTr {
+			if output == nil {
+				output = &bytes.Buffer{}
+				maxSize := len(str) * 4
+
+				// Avoid to reserve too much memory at once.
+				if maxSize > _TRANSLATE_INIT_GROW_SIZE_MAX {
+					maxSize = _TRANSLATE_INIT_GROW_SIZE_MAX
+				}
+
+				output.Grow(maxSize)
+				output.WriteString(orig[:len(orig)-len(str)])
+			}
+
+			if to != utf8.RuneError {
+				output.WriteRune(to)
+			}
+		} else {
+			if output != nil {
+				output.WriteRune(r)
+			}
+		}
+
+		str = str[size:]
+	}
+
+	// No character is translated.
+	if output == nil {
+		return str
+	}
+
+	return output.String()
+}
+
+// Translate str with the characters defined in from replaced by characters defined in to.
+//
+// From and to are patterns representing a set of characters. Pattern is defined as following.
+//
+//     * Special characters
+//       * '-' means a range of runes, e.g.
+//         * "a-z" means all characters from 'a' to 'z' inclusive;
+//         * "z-a" means all characters from 'z' to 'a' inclusive.
+//       * '^' as first character means a set of all runes excepted listed, e.g.
+//         * "^a-z" means all characters except 'a' to 'z' inclusive.
+//       * '\' escapes special characters.
+//     * Normal character represents itself, e.g. "abc" is a set including 'a', 'b' and 'c'.
+//
+// Translate will try to find a 1:1 mapping from from to to.
+// If to is smaller than from, last rune in to will be used to map "out of range" characters in from.
+//
+// Note that '^' only works in the from pattern. It will be considered as a normal character in the to pattern.
+//
+// Samples:
+//     Translate("hello", "aeiou", "12345")    => "h2ll4"
+//     Translate("hello", "a-z", "A-Z")        => "HELLO"
+//     Translate("hello", "z-a", "a-z")        => "svool"
+//     Translate("hello", "aeiou", "*")        => "h*ll*"
+//     Translate("hello", "^l", "*")           => "**ll*"
+//     Translate("hello ^ world", `\^lo`, "*") => "he*** * w*r*d"
+func Translate(str, from, to string) string {
+	tr := NewTranslator(from, to)
+	return tr.Translate(str)
+}
