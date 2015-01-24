@@ -53,6 +53,7 @@ Here is a list of functions in [strings](http://golang.org/pkg/strings) and [xst
 | [Len](https://godoc.org/github.com/huandu/xstrings#Len) | `mb_strlen` in PHP | [#23](https://github.com/huandu/xstrings/issues/23) |
 | [Partition](https://godoc.org/github.com/huandu/xstrings#Partition) | `str.partition` in Python; `String#partition` in Ruby | [#10](https://github.com/huandu/xstrings/issues/10) |
 | [Reverse](https://godoc.org/github.com/huandu/xstrings#Reverse) | `String#reverse` in Ruby; `strrev` in PHP; `reverse` in Perl | [#7](https://github.com/huandu/xstrings/issues/7) |
+| [RightJustify](https://godoc.org/github.com/huandu/xstrings#RightJustify) | `str.rjust` in Python; `String#rjust` in Ruby | [#29](https://github.com/huandu/xstrings/issues/29) |
 | [RuneWidth](https://godoc.org/github.com/huandu/xstrings#RuneWidth) | - | [#27](https://github.com/huandu/xstrings/issues/27) |
 | [Scrub](https://godoc.org/github.com/huandu/xstrings#Scrub) | `String#scrub` in Ruby | [#20](https://github.com/huandu/xstrings/issues/20) |
 | [Shuffle](https://godoc.org/github.com/huandu/xstrings#Shuffle) | `str_shuffle` in PHP | [#13](https://github.com/huandu/xstrings/issues/13) |
