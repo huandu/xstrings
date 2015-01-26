@@ -80,36 +80,44 @@ func Slice(str string, start, end int) string {
 // The return value is a slice of strings with head, match and tail.
 //
 // If str contains sep, for example "hello" and "l", Partition returns
-//     []string{"he", "l", "lo"}
+//     "he", "l", "lo"
 //
 // If str doesn't contain sep, for example "hello" and "x", Partition returns
-//     []string{"hello", "", ""}
-func Partition(str, sep string) []string {
+//     "hello", "", ""
+func Partition(str, sep string) (head, match, tail string) {
 	index := strings.Index(str, sep)
 
 	if index == -1 {
-		return []string{str, "", ""}
+		head = str
+		return
 	}
 
-	return []string{str[:index], sep, str[index+len(sep):]}
+	head = str[:index]
+	match = str[index : index+len(sep)]
+	tail = str[index+len(sep):]
+	return
 }
 
 // LastPartition splits a string by last instance of sep into three parts.
 // The return value is a slice of strings with head, match and tail.
 //
 // If str contains sep, for example "hello" and "l", LastPartition returns
-//     []string{"hel", "l", "o"}
+//     "hel", "l", "o"
 //
 // If str doesn't contain sep, for example "hello" and "x", LastPartition returns
-//     []string{"", "", "hello"}
-func LastPartition(str, sep string) []string {
+//     "", "", "hello"
+func LastPartition(str, sep string) (head, match, tail string) {
 	index := strings.LastIndex(str, sep)
 
 	if index == -1 {
-		return []string{"", "", str}
+		tail = str
+		return
 	}
 
-	return []string{str[:index], sep, str[index+len(sep):]}
+	head = str[:index]
+	match = str[index : index+len(sep)]
+	tail = str[index+len(sep):]
+	return
 }
 
 // Insert src into dst at given rune index.
