@@ -54,24 +54,32 @@ func NewTranslator(from, to string) *Translator {
 	var fromRangeSize, toRangeSize rune
 	var singleRunes []rune
 
+	// Update the to rune range.
 	updateRange := func() {
-		// Update the to rune range.
-		if toEnd != utf8.RuneError {
-			if toRangeStep == 0 {
-				to, toStart, toEnd, toRangeStep = nextRuneRange(to, toEnd)
-			} else {
-				if toStart == toEnd {
-					if len(to) > 0 {
-						to, toStart, toEnd, toRangeStep = nextRuneRange(to, utf8.RuneError)
-					} else {
-						// Repeat last rune.
-						toEnd = utf8.RuneError
-					}
-				} else {
-					toStart += toRangeStep
-				}
-			}
+		// No more rune to read in the to rune pattern.
+		if toEnd == utf8.RuneError {
+			return
 		}
+
+		if toRangeStep == 0 {
+			to, toStart, toEnd, toRangeStep = nextRuneRange(to, toEnd)
+			return
+		}
+
+		// Current range is not empty. Consume 1 rune from start.
+		if toStart != toEnd {
+			toStart += toRangeStep
+			return
+		}
+
+		// No more rune. Repeat the last rune.
+		if to == "" {
+			toEnd = utf8.RuneError
+			return
+		}
+
+		// Both start and end are used. Read two more runes from the to pattern.
+		to, toStart, toEnd, toRangeStep = nextRuneRange(to, utf8.RuneError)
 	}
 
 	if deletion {
@@ -301,19 +309,12 @@ func (tr *Translator) Translate(str string) string {
 		r, size = utf8.DecodeRuneInString(str)
 		r, needTr = tr.TranslateRune(r)
 
-		// No need to translate.
-		if needTr {
-			if output == nil {
-				output = allocBuffer(orig, str)
-			}
+		if needTr && output == nil {
+			output = allocBuffer(orig, str)
+		}
 
-			if r != utf8.RuneError {
-				output.WriteRune(r)
-			}
-		} else {
-			if r != utf8.RuneError && output != nil {
-				output.WriteRune(r)
-			}
+		if r != utf8.RuneError && output != nil {
+			output.WriteRune(r)
 		}
 
 		str = str[size:]

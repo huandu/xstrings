@@ -37,6 +37,10 @@ func TestTranslate(t *testing.T) {
 		sep("hello", "-e-", "p"):       "hpllo",
 		sep("hello", "----e---", "p"):  "hpllo",
 		sep("hello", "^---e----", "p"): "peppp",
+
+		sep("hel\uFFFDlo", "\uFFFD", "H"):    "helHlo",
+		sep("hel\uFFFDlo", "^\uFFFD", "H"):   "HHHHH",
+		sep("hel\uFFFDlo", "o-\uFFFDh", "H"): "HelHlH",
 	})
 }
 
