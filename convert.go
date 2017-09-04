@@ -6,6 +6,7 @@ package xstrings
 import (
 	"bytes"
 	"math/rand"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -23,6 +24,7 @@ func ToCamelCase(str string) string {
 	if len(str) == 0 {
 		return ""
 	}
+	str = strings.ToLower(str)
 
 	buf := &bytes.Buffer{}
 	var r0, r1 rune

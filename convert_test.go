@@ -35,6 +35,7 @@ func TestToCamelCase(t *testing.T) {
 		"no_https":        "NoHttps",
 		"_complex__case_": "_Complex_Case_",
 		"all":             "All",
+		"GOLANG":          "Golang",
 	})
 }
 
