@@ -81,10 +81,14 @@ func TestSqueeze(t *testing.T) {
 	}
 
 	runTestCases(t, runner, _M{
-		sep("hello", ""):     "helo",
-		sep("hello", "a-k"):  "hello",
-		sep("hello", "^a-k"): "helo",
-		sep("hello", "^a-l"): "hello",
+		sep("hello", ""):             "helo",
+		sep("hello     world", ""):   "helo world",
+		sep("hello     world", " "):  "hello world",
+		sep("hello     world", "  "): "hello world",
+		sep("hello", "a-k"):          "hello",
+		sep("hello", "^a-k"):         "helo",
+		sep("hello", "^a-l"):         "hello",
+		sep("foooo baaaaar", "a"):    "foooo bar",
 
 		sep("打打打打个劫！！", ""):  "打个劫！",
 		sep("打打打打个劫！！", "打"): "打个劫！！",
