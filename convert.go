@@ -43,7 +43,7 @@ func ToCamelCase(str string) string {
 	if len(str) == 0 {
 		return buf.String()
 	}
-	
+
 	r0 = unicode.ToUpper(r0)
 
 	for len(str) > 0 {
