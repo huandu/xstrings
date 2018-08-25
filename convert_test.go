@@ -22,6 +22,11 @@ func TestToSnakeCase(t *testing.T) {
 		"HELLO____WORLD":     "hello____world",
 		"TW":                 "tw",
 		"_C":                 "_c",
+		"http2xx":            "http_2xx",
+		"HTTP2XX":            "http_2xx",
+		"HTTP20xOK":          "http_20x_ok",
+		"HTTP20XStatus":      "http_20x_status",
+		"HTTP-20xStatus":     "http_20x_status",
 
 		"  sentence case  ":                                    "__sentence_case__",
 		" Mixed-hyphen case _and SENTENCE_case and UPPER-case": "_mixed_hyphen_case__and_sentence_case_and_upper_case",
