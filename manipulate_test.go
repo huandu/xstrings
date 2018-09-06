@@ -107,7 +107,7 @@ func TestInsert(t *testing.T) {
 		sep("abcdefg", "hi", "3"):    "abchidefg",
 		sep("少量中文是必须的", "混pai", "4"): "少量中文混pai是必须的",
 		sep("zh英文hun排", "~！", "5"):   "zh英文h~！un排",
-		sep("插在begining", "我", "0"):  "我插在begining",
+		sep("插在beginning", "我", "0"): "我插在beginning",
 		sep("插在ending", "我", "8"):    "插在ending我",
 
 		sep("超tian出yuan边tu界po", "foo", "-1"): "out of range",
