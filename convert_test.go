@@ -27,8 +27,9 @@ func TestToSnakeCaseAndToKebabCase(t *testing.T) {
 		"HTTP20xOK":          "http_20x_ok",
 		"HTTP20XStatus":      "http_20x_status",
 		"HTTP-20xStatus":     "http_20x_status",
+		"a":                  "a",
 
-		"  sentence case  ":                                    "__sentence_case__",
+		"  sentence case  ": "__sentence_case__",
 		" Mixed-hyphen case _and SENTENCE_case and UPPER-case": "_mixed_hyphen_case__and_sentence_case_and_upper_case",
 
 		"": "",
@@ -53,6 +54,8 @@ func TestToCamelCase(t *testing.T) {
 		"all":             "All",
 		"GOLANG_IS_GREAT": "GolangIsGreat",
 		"GOLANG":          "Golang",
+		"a":               "A",
+		"好":               "好",
 
 		"": "",
 	})
@@ -62,6 +65,7 @@ func TestSwapCase(t *testing.T) {
 	runTestCases(t, SwapCase, _M{
 		"swapCase": "SWAPcASE",
 		"Θ~λa云Ξπ":  "θ~ΛA云ξΠ",
+		"a":        "A",
 
 		"": "",
 	})
@@ -72,6 +76,7 @@ func TestFirstRuneToUpper(t *testing.T) {
 		"hello, world!": "Hello, world!",
 		"Hello, world!": "Hello, world!",
 		"你好，世界！":        "你好，世界！",
+		"a":             "A",
 
 		"": "",
 	})
@@ -82,6 +87,8 @@ func TestFirstRuneToLower(t *testing.T) {
 		"hello, world!": "hello, world!",
 		"Hello, world!": "hello, world!",
 		"你好，世界！":        "你好，世界！",
+		"a":             "a",
+		"A":             "a",
 
 		"": "",
 	})
