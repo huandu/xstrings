@@ -31,6 +31,7 @@ func TestToSnakeCaseAndToKebabCase(t *testing.T) {
 
 		"  sentence case  ": "__sentence_case__",
 		" Mixed-hyphen case _and SENTENCE_case and UPPER-case": "_mixed_hyphen_case__and_sentence_case_and_upper_case",
+		"FROM CamelCase to snake/kebab-case":                   "from_camel_case_to_snake/kebab_case",
 
 		"": "",
 		"Abc\uFFFDE\uFFFDf\uFFFDd\uFFFD2\uFFFD00Z\uFFFDZZ\uFFFDZZ": "abc\uFFFD_e\uFFFDf\uFFFDd\uFFFD_2\uFFFD_00z\uFFFD_zz\uFFFD_zz",
@@ -51,11 +52,14 @@ func TestToCamelCase(t *testing.T) {
 		"_camel_case":     "_CamelCase",
 		"no_https":        "NoHttps",
 		"_complex__case_": "_Complex_Case_",
+		" complex -case ": " Complex Case ",
 		"all":             "All",
 		"GOLANG_IS_GREAT": "GolangIsGreat",
 		"GOLANG":          "Golang",
 		"a":               "A",
 		"好":               "好",
+
+		"FROM CamelCase to snake/kebab-case": "FromCamelcaseToSnake/kebabCase",
 
 		"": "",
 	})
