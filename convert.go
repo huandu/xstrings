@@ -151,7 +151,6 @@ func camelCaseToLowerCase(str string, connector rune) string {
 			}
 
 			if len(remaining) == 0 {
-				toLower(buf, numberWord, word, connector)
 				break
 			}
 

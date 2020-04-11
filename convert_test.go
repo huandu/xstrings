@@ -32,9 +32,11 @@ func TestToSnakeCaseAndToKebabCase(t *testing.T) {
 		"Bld4Floor3rd":       "bld4_floor_3rd",
 		" _-_ ":              "_____",
 		"a1b2c3d":            "a_1b2c3d",
+		"A//B%%2c":           "a//b%%2c",
 
 		"HTTP状态码404/502Error": "http_状态码404/502_error",
 		"中文(字符)":              "中文(字符)",
+		"混合ABCWords与123数字456": "混合_abc_words_与123_数字456",
 
 		"  sentence case  ": "__sentence_case__",
 		" Mixed-hyphen case _and SENTENCE_case and UPPER-case": "_mixed_hyphen_case__and_sentence_case_and_upper_case",
@@ -42,6 +44,7 @@ func TestToSnakeCaseAndToKebabCase(t *testing.T) {
 
 		"": "",
 		"Abc\uFFFDE\uFFFDf\uFFFDd\uFFFD2\uFFFD00z\uFFFDZZ\uFFFDZZ": "abc_\uFFFDe\uFFFDf\uFFFDd_\uFFFD2\uFFFD00z_\uFFFDzz\uFFFDzz",
+		"\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD":                           "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD",
 	}
 
 	runTestCases(t, ToSnakeCase, cases)
