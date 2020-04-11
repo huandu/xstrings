@@ -23,18 +23,25 @@ func TestToSnakeCaseAndToKebabCase(t *testing.T) {
 		"TW":                 "tw",
 		"_C":                 "_c",
 		"http2xx":            "http_2xx",
-		"HTTP2XX":            "http_2xx",
+		"HTTP2XX":            "http2_xx",
 		"HTTP20xOK":          "http_20x_ok",
-		"HTTP20XStatus":      "http_20x_status",
+		"HTTP20xStatus":      "http_20x_status",
 		"HTTP-20xStatus":     "http_20x_status",
 		"a":                  "a",
+		"Duration2m3s":       "duration_2m3s",
+		"Bld4Floor3rd":       "bld4_floor_3rd",
+		" _-_ ":              "_____",
+		"a1b2c3d":            "a_1b2c3d",
+
+		"HTTP状态码404/502Error": "http_状态码404/502_error",
+		"中文(字符)":              "中文(字符)",
 
 		"  sentence case  ": "__sentence_case__",
 		" Mixed-hyphen case _and SENTENCE_case and UPPER-case": "_mixed_hyphen_case__and_sentence_case_and_upper_case",
 		"FROM CamelCase to snake/kebab-case":                   "from_camel_case_to_snake/kebab_case",
 
 		"": "",
-		"Abc\uFFFDE\uFFFDf\uFFFDd\uFFFD2\uFFFD00Z\uFFFDZZ\uFFFDZZ": "abc\uFFFD_e\uFFFDf\uFFFDd\uFFFD_2\uFFFD_00z\uFFFD_zz\uFFFD_zz",
+		"Abc\uFFFDE\uFFFDf\uFFFDd\uFFFD2\uFFFD00z\uFFFDZZ\uFFFDZZ": "abc_\uFFFDe\uFFFDf\uFFFDd_\uFFFD2\uFFFD00z_\uFFFDzz\uFFFDzz",
 	}
 
 	runTestCases(t, ToSnakeCase, cases)
