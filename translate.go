@@ -152,12 +152,12 @@ func NewTranslator(from, to string) *Translator {
 			continue
 		}
 
-		fromStart, toStart = tr.addRuneRange(fromStart, fromEnd, toStart, toStart, singleRunes)
+		_, toStart = tr.addRuneRange(fromStart, fromEnd, toStart, toStart, singleRunes)
 		fromEnd = utf8.RuneError
 	}
 
 	if fromEnd != utf8.RuneError {
-		singleRunes = tr.addRune(fromEnd, toStart, singleRunes)
+		_ = tr.addRune(fromEnd, toStart, singleRunes)
 	}
 
 	tr.reverted = reverted
