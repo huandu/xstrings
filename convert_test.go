@@ -188,9 +188,9 @@ func TestShuffleSource(t *testing.T) {
 
 	runTestCases(t, runner, _M{
 		"":            "",
-		"facgbheidjk": "bakefjgichd",
-		"尝试中文怎么样":     "怎试中样尝么文",
-		"zh英文hun排":    "hh英nzu文排",
+		"facgbheidjk": "bkgfijached",
+		"尝试中文怎么样":     "试怎么文中样尝",
+		"zh英文hun排":    "英nuh排文zh",
 	})
 }
 
