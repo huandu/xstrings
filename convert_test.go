@@ -181,16 +181,16 @@ func (src *testShuffleSource) Int63() int64 {
 func (*testShuffleSource) Seed(int64) {}
 
 func TestShuffleSource(t *testing.T) {
-	var src testShuffleSource
 	runner := func(str string) string {
+		var src testShuffleSource
 		return ShuffleSource(str, &src)
 	}
 
 	runTestCases(t, runner, _M{
 		"":            "",
 		"facgbheidjk": "bkgfijached",
-		"尝试中文怎么样":     "试怎么文中样尝",
-		"zh英文hun排":    "英nuh排文zh",
+		"尝试中文怎么样":     "怎试么中样尝文",
+		"zh英文hun排":    "zuhh文n英排",
 	})
 }
 
