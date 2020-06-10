@@ -31,9 +31,9 @@ func TestWordCount(t *testing.T) {
 		"中文":                      "0",
 		"你好，sekai！":               "1",
 		"oh, it's super-fancy!!a": "4",
-		"":        "0",
-		"-":       "0",
-		"it's-'s": "1",
+		"":                        "0",
+		"-":                       "0",
+		"it's-'s":                 "1",
 	})
 }
 
@@ -45,7 +45,7 @@ func TestWidth(t *testing.T) {
 	runTestCases(t, runner, _M{
 		"abcd\t0123\n7890": "12",
 		"中zh英eng文混排":       "15",
-		"": "0",
+		"":                 "0",
 	})
 }
 
