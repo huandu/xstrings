@@ -172,25 +172,25 @@ var testShuffleTable = []int64{
 	2873287401706343734,
 }
 
-func (src testShuffleSource) Int63() int64 {
-	n := testShuffleTable[int(src)%len(testShuffleTable)]
-	src++
+func (src *testShuffleSource) Int63() int64 {
+	n := testShuffleTable[int(*src)%len(testShuffleTable)]
+	(*src)++
 	return n
 }
 
-func (src testShuffleSource) Seed(int64) {}
+func (*testShuffleSource) Seed(int64) {}
 
 func TestShuffleSource(t *testing.T) {
-	var src testShuffleSource
 	runner := func(str string) string {
-		return ShuffleSource(str, src)
+		var src testShuffleSource
+		return ShuffleSource(str, &src)
 	}
 
 	runTestCases(t, runner, _M{
 		"":            "",
-		"facgbheidjk": "bakefjgichd",
-		"尝试中文怎么样":     "怎试中样尝么文",
-		"zh英文hun排":    "hh英nzu文排",
+		"facgbheidjk": "bkgfijached",
+		"尝试中文怎么样":     "怎试么中样尝文",
+		"zh英文hun排":    "zuhh文n英排",
 	})
 }
 
