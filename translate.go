@@ -157,7 +157,7 @@ func NewTranslator(from, to string) *Translator {
 	}
 
 	if fromEnd != utf8.RuneError {
-		_ = tr.addRune(fromEnd, toStart, singleRunes)
+		tr.addRune(fromEnd, toStart, singleRunes)
 	}
 
 	tr.reverted = reverted
