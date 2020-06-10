@@ -4,7 +4,6 @@
 package xstrings
 
 import (
-	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -303,7 +302,7 @@ func (tr *Translator) Translate(str string) string {
 
 	orig := str
 
-	var output *strings.Builder
+	var output *bufferString
 
 	for len(str) > 0 {
 		r, size = utf8.DecodeRuneInString(str)
@@ -500,7 +499,7 @@ func Squeeze(str, pattern string) string {
 	var size int
 	var skipSqueeze, matched bool
 	var tr *Translator
-	var output *strings.Builder
+	var output *bufferString
 
 	orig := str
 	last = -1

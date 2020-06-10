@@ -130,7 +130,7 @@ func Insert(dst, src string, index int) string {
 // Scrub scrubs invalid utf8 bytes with repl string.
 // Adjacent invalid bytes are replaced only once.
 func Scrub(str, repl string) string {
-	var buf *strings.Builder
+	var buf *bufferString
 	var r rune
 	var size, pos int
 	var hasError bool
@@ -143,7 +143,7 @@ func Scrub(str, repl string) string {
 		if r == utf8.RuneError {
 			if !hasError {
 				if buf == nil {
-					buf = &strings.Builder{}
+					buf = &bufferString{}
 				}
 
 				buf.WriteString(origin[:pos])

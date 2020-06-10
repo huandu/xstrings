@@ -3,15 +3,11 @@
 
 package xstrings
 
-import (
-	"strings"
-)
-
 const bufferMaxInitGrowSize = 2048
 
 // Lazy initialize a buffer.
-func allocBuffer(orig, cur string) *strings.Builder {
-	output := &strings.Builder{}
+func allocBuffer(orig, cur string) *bufferString {
+	output := &bufferString{}
 	maxSize := len(orig) * 4
 
 	// Avoid to reserve too much memory at once.
