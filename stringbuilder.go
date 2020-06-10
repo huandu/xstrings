@@ -4,4 +4,4 @@ package xstrings
 
 import "strings"
 
-type bufferString = strings.Builder
+type stringBuilder = strings.Builder

@@ -27,7 +27,7 @@ func ExpandTabs(str string, tabSize int) string {
 
 	var r rune
 	var i, size, column, expand int
-	var output *bufferString
+	var output *stringBuilder
 
 	orig := str
 
@@ -87,7 +87,7 @@ func LeftJustify(str string, length int, pad string) string {
 	remains := length - l
 	padLen := Len(pad)
 
-	output := &bufferString{}
+	output := &stringBuilder{}
 	output.Grow(len(str) + (remains/padLen+1)*len(pad))
 	output.WriteString(str)
 	writePadString(output, pad, padLen, remains)
@@ -113,7 +113,7 @@ func RightJustify(str string, length int, pad string) string {
 	remains := length - l
 	padLen := Len(pad)
 
-	output := &bufferString{}
+	output := &stringBuilder{}
 	output.Grow(len(str) + (remains/padLen+1)*len(pad))
 	writePadString(output, pad, padLen, remains)
 	output.WriteString(str)
@@ -139,7 +139,7 @@ func Center(str string, length int, pad string) string {
 	remains := length - l
 	padLen := Len(pad)
 
-	output := &bufferString{}
+	output := &stringBuilder{}
 	output.Grow(len(str) + (remains/padLen+1)*len(pad))
 	writePadString(output, pad, padLen, remains/2)
 	output.WriteString(str)
@@ -147,7 +147,7 @@ func Center(str string, length int, pad string) string {
 	return output.String()
 }
 
-func writePadString(output *bufferString, pad string, padLen, remains int) {
+func writePadString(output *stringBuilder, pad string, padLen, remains int) {
 	var r rune
 	var size int
 

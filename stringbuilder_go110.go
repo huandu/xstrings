@@ -4,6 +4,6 @@ package xstrings
 
 import "bytes"
 
-type bufferString struct {
+type stringBuilder struct {
 	bytes.Buffer
 }
