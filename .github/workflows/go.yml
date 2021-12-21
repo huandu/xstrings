@@ -2,24 +2,34 @@ name: Go
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
-
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
-    - name: Build
-      run: go build -v ./...
+      - name: Get dependencies
+        run: |
+          go mod download
+          go get
 
-    - name: Test
-      run: go test -v ./...
+      - name: Test
+        run: go test -v -coverprofile=covprofile.cov ./...
+
+      - name: Send coverage
+        env:
+          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          go get github.com/mattn/goveralls
+          go run github.com/mattn/goveralls -coverprofile=covprofile.cov -service=github
