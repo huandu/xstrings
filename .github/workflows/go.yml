@@ -32,4 +32,4 @@ jobs:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           go install github.com/mattn/goveralls
-          go run github.com/mattn/goveralls -coverprofile=covprofile.cov -service=github
+          goveralls -coverprofile=covprofile.cov -service=github
