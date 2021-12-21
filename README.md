@@ -1,6 +1,6 @@
 # xstrings
 
-[![Build Status](https://travis-ci.com/huandu/xstrings.svg?branch=master)](https://travis-ci.com/huandu/xstrings)
+[![Build Status](https://github.com/huandu/xstrings/workflows/Go/badge.svg)](https://github.com/huandu/xstrings/actions)
 [![Go Doc](https://godoc.org/github.com/huandu/xstrings?status.svg)](https://pkg.go.dev/github.com/huandu/xstrings)
 [![Go Report](https://goreportcard.com/badge/github.com/huandu/xstrings)](https://goreportcard.com/report/github.com/huandu/xstrings)
 [![Coverage Status](https://coveralls.io/repos/github/huandu/xstrings/badge.svg?branch=master)](https://coveralls.io/github/huandu/xstrings?branch=master)
