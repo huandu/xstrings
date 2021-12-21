@@ -31,5 +31,6 @@ jobs:
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          go get github.com/mattn/goveralls
           go install github.com/mattn/goveralls
           goveralls -coverprofile=covprofile.cov -service=github
