@@ -45,6 +45,8 @@ func TestToSnakeCaseAndToKebabCase(t *testing.T) {
 		"": "",
 		"Abc\uFFFDE\uFFFDf\uFFFDd\uFFFD2\uFFFD00z\uFFFDZZ\uFFFDZZ": "abc_\uFFFDe\uFFFDf\uFFFDd_\uFFFD2\uFFFD00z_\uFFFDzz\uFFFDzz",
 		"\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD":                           "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD",
+
+		"abc_123_def": "abc_123_def",
 	}
 
 	runTestCases(t, ToSnakeCase, cases)
