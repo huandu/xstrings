@@ -66,12 +66,12 @@ func TestToCamelCase(t *testing.T) {
 		"_complex__case_": "_Complex_Case_",
 		" complex -case ": " Complex Case ",
 		"all":             "All",
-		"GOLANG_IS_GREAT": "GolangIsGreat",
-		"GOLANG":          "Golang",
+		"GOLANG_IS_GREAT": "GOLANGISGREAT",
+		"GOLANG":          "GOLANG",
 		"a":               "A",
 		"好":               "好",
 
-		"FROM CamelCase to snake/kebab-case": "FromCamelcaseToSnake/kebabCase",
+		"FROM CamelCase to snake/kebab-case": "FROMCamelCaseToSnake/kebabCase",
 
 		"": "",
 	})
