@@ -55,6 +55,10 @@ func Slice(str string, start, end int) string {
 		str = str[size:]
 	}
 
+	if start > 0 {
+		panic("out of range")
+	}
+
 	if end < 0 {
 		return origin[startPos:]
 	}

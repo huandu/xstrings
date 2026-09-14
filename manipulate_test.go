@@ -42,6 +42,9 @@ func TestSlice(t *testing.T) {
 		sep("中en文混~排总是少不了的a", "5", "-1"):  "~排总是少不了的a",
 		sep("中en文混~排总是少不了的a", "14", "-1"): "",
 
+		sep("abc", "4", "-1"):                       "out of range",
+		sep("中文", "3", "-1"):                        "out of range",
+		sep("", "1", "-1"):                          "out of range",
 		sep("let us slice out of range", "-3", "3"): "out of range",
 		sep("超出范围哦", "2", "6"):                      "out of range",
 		sep("don't do this", "3", "2"):              "out of range",
