@@ -131,14 +131,8 @@ func TestIssueTranslateToNulIsIgnored(t *testing.T) {
 // to continue over a rune of a different kind (letter vs. digit), which is what
 // Ruby's String#succ does. xstrings keeps carrying it to the left instead.
 //
-// This is a deviation from the "friend" function listed in README, so it needs
-// a decision from the maintainer before the behaviour is locked in tests.
-//
-// current: Successor("1*z") == "2*a"
-// ruby:    "1*z".succ == "1*aa"
+// Regression test for #67.
 func TestIssueSuccessorCarryAcrossRuneKind(t *testing.T) {
-	t.Skip(`open question: Successor keeps a carry over a letter/digit boundary, Ruby stops it, e.g. Successor("1*z") == "2*a", ruby == "1*aa"`)
-
 	runTestCases(t, Successor, _M{
 		"1*z":  "1*aa",
 		"8a_9": "8a_10",
@@ -146,5 +140,15 @@ func TestIssueSuccessorCarryAcrossRuneKind(t *testing.T) {
 		"0.Z":  "0.AA",
 		"z*9":  "z*10",
 		"9-Z":  "9-AA",
+		"99 z": "99 aa",
+		"09 z": "09 aa",
+		"1*z9": "1*aa0",
+		"Z.9 ": "Z.10 ",
+		"9.z9": "9.aa0",
+		"a1-Z": "a1-AA",
+		"80.z": "80.aa",
+		"z0*z": "z0*aa",
+		"-1_z": "-1_aa",
+		"0*-Z": "0*-AA",
 	})
 }
