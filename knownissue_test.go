@@ -85,11 +85,8 @@ func TestIssueCamelCaseDuplicatesTrailingConnector(t *testing.T) {
 // which decodes to utf8.RuneError is dropped, even if it is a valid U+FFFD rune
 // which does not match the pattern.
 //
-// current: Translate("a\uFFFDb", "a", "x") == "xb", Delete("a\uFFFDb", "a") == "b"
-// want:    "x\uFFFDb", "\uFFFDb"
+// Regression test for #65.
 func TestIssueTranslateDropsUnmatchedRuneError(t *testing.T) {
-	t.Skip(`known bug: Translate/Delete drop a valid U+FFFD rune once some other rune has been translated`)
-
 	cases := []struct {
 		name string
 		got  string

@@ -39,8 +39,10 @@ func TestTranslate(t *testing.T) {
 		sep("hello", "----e---", "p"):  "hpllo",
 		sep("hello", "^---e----", "p"): "peppp",
 
-		sep("hel\uFFFDlo", "\uFFFD", "H"):    "helHlo",
-		sep("hel\uFFFDlo", "^\uFFFD", "H"):   "HHHHH",
+		sep("hel\uFFFDlo", "\uFFFD", "H"): "helHlo",
+		// A reverted pattern matches every rune but U+FFFD, so U+FFFD is
+		// kept as is instead of being dropped. See #65.
+		sep("hel\uFFFDlo", "^\uFFFD", "H"):   "HHH\uFFFDHH",
 		sep("hel\uFFFDlo", "o-\uFFFDh", "H"): "HelHlH",
 
 		// An empty from pattern means nothing is translated.
@@ -98,7 +100,33 @@ func TestTranslate(t *testing.T) {
 		// takes over that rune.
 		sep("中", "中一-龥", "XY"):  "Y",
 		sep("中一", "中一-龥", "XY"): "YY",
+
+		// A rune which is not matched is kept as is, including a valid
+		// U+FFFD rune and invalid bytes. See #65.
+		sep("a\uFFFDb", "a", "x"):      "x\uFFFDb",
+		sep("\uFFFDa", "a", "x"):       "\uFFFDx",
+		sep("a\xffb", "a", "x"):        "x\xffb",
+		sep("a\xff\xfe b", "a-b", "X"): "X\xff\xfe X",
 	})
+}
+
+func TestTranslateCountDeleteConsistency(t *testing.T) {
+	// Count reports how many runes match the pattern and Delete removes
+	// exactly those runes, so Delete must not drop anything else. This used
+	// to fail for U+FFFD and for invalid bytes. See #65.
+	inputs := []string{"a\uFFFDb", "a\xffb", "\uFFFD\uFFFD", "hello 世界", "中\uFFFDb", ""}
+	patterns := []string{"a-z", "a", "^a-z", "中", "\uFFFD", "^"}
+
+	for _, str := range inputs {
+		for _, pattern := range patterns {
+			got := Len(Delete(str, pattern)) + Count(str, pattern)
+
+			if want := Len(str); got != want {
+				t.Fatalf("Len(Delete(%q, %q)) + Count(%q, %q) = %d, want %d",
+					str, pattern, str, pattern, got, want)
+			}
+		}
+	}
 }
 
 func TestDelete(t *testing.T) {
