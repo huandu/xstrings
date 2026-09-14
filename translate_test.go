@@ -107,6 +107,10 @@ func TestTranslate(t *testing.T) {
 		sep("\uFFFDa", "a", "x"):       "\uFFFDx",
 		sep("a\xffb", "a", "x"):        "x\xffb",
 		sep("a\xff\xfe b", "a-b", "X"): "X\xff\xfe X",
+
+		// A rune can be translated to a NUL rune. See #66.
+		sep("hello", "h", "\x00"):  "\x00ello",
+		sep("hello", "l", "\x00x"): "he\x00\x00o",
 	})
 }
 
@@ -254,6 +258,10 @@ func TestTranslatorTranslateRune(t *testing.T) {
 		// utf8.RuneError, which is then dropped by Translate.
 		{"ab", "", 'a', utf8.RuneError, true},
 		{"ab", "", 'x', 'x', false},
+
+		// A mapping whose target rune is U+0000 is a regular mapping. See #66.
+		{"h", "\x00", 'h', 0, true},
+		{"h", "\x00", 'x', 'x', false},
 
 		// Without any pattern every rune is returned as is.
 		{"", "", 'a', 'a', false},
