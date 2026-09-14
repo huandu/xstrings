@@ -309,8 +309,15 @@ func TestSuccessor(t *testing.T) {
 		"ZZZ9999":   "AAAA0000",
 		"***":       "**+",
 
-		"来点中文试试":               "来点中文试诖",
-		"中cZ英ZZ文zZ混9zZ9杂99进z位": "中dA英AA文aA混0aA0杂00进a位",
+		"来点中文试试": "来点中文试诖",
+
+		// A carry stops in front of the rune which generated it when it is
+		// about to cross a rune of another kind (letter vs. number).
+		"中cZ英ZZ文zZ混9zZ9杂99进z位": "中cZ英ZZ文zZ混9zZ9杂99进aa位",
+		"8a_9":                 "8a_10",
+		"1*z":                  "1*aa",
+		"1 Z":                  "1 AA",
+		"0.Z":                  "0.AA",
 
 		// Carries which are absorbed by an alphanumeric rune on the left.
 		"z":  "aa",
