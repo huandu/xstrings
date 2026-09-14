@@ -612,7 +612,7 @@ func Successor(str string) string {
 		buf.Grow(l + 4) // Reserve enough space for write.
 
 		if lastAlphanumeric != 0 {
-			buf.WriteString(str[:lastAlphanumeric])
+			buf.WriteString(string(runes[:lastAlphanumeric]))
 		}
 
 		buf.WriteRune(carry)

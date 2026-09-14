@@ -36,11 +36,8 @@ func TestIssueSuccessorCarryFromNine(t *testing.T) {
 // Successor: the prefix in front of the inserted carry rune is sliced with a
 // rune index used as a byte offset, which cuts multibyte runes.
 //
-// current: Successor("中z") == "\xe4aa", which is not a valid utf8 string
-// want:    Successor("中z") == "中aa"
+// Regression test for #63.
 func TestIssueSuccessorSlicesMultibytePrefixByRune(t *testing.T) {
-	t.Skip(`known bug: Successor uses a rune index as a byte offset, e.g. Successor("中z") == "\xe4aa" instead of "中aa"`)
-
 	cases := _M{
 		"中z":  "中aa",
 		"üZ":  "üAA",
