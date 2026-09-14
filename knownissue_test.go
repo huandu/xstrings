@@ -108,11 +108,8 @@ func TestIssueTranslateDropsUnmatchedRuneError(t *testing.T) {
 // Translate: a translated rune whose value is 0 (NUL) is silently ignored,
 // because 0 is used as the "no mapping" marker of the quick dictionary.
 //
-// current: Translate("hello", "h", "\x00") == "hello"
-// want:    "\x00ello"
+// Regression test for #66.
 func TestIssueTranslateToNulIsIgnored(t *testing.T) {
-	t.Skip(`known bug: mapping a rune to "\x00" is ignored, e.g. Translate("hello", "h", "\x00") == "hello"`)
-
 	cases := []struct {
 		name string
 		got  string

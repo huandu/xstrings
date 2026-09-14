@@ -17,6 +17,7 @@ type runeRangeMap struct {
 
 type runeDict struct {
 	Dict [unicode.MaxASCII + 1]rune
+	Set  [unicode.MaxASCII + 1]bool
 }
 
 type runeMap map[rune]rune
@@ -180,6 +181,7 @@ func (tr *Translator) addRune(from, to rune, singleRunes []rune) []rune {
 		}
 
 		tr.quickDict.Dict[from] = to
+		tr.quickDict.Set[from] = true
 	} else {
 		if tr.runeMap == nil {
 			tr.runeMap = make(runeMap)
@@ -217,6 +219,7 @@ func (tr *Translator) addRuneRange(fromLo, fromHi, toLo, toHi rune, singleRunes 
 		if rrm.FromLo <= r && r <= rrm.FromHi {
 			if r <= unicode.MaxASCII {
 				tr.quickDict.Dict[r] = 0
+				tr.quickDict.Set[r] = false
 			} else {
 				delete(tr.runeMap, r)
 			}
@@ -356,9 +359,8 @@ func (tr *Translator) translateRune(r rune) (result rune, matched, deleted bool)
 	switch {
 	case tr.quickDict != nil:
 		if r <= unicode.MaxASCII {
-			result = tr.quickDict.Dict[r]
-
-			if result != 0 {
+			if tr.quickDict.Set[r] {
+				result = tr.quickDict.Dict[r]
 				matched = true
 
 				if tr.mappedRune >= 0 {
