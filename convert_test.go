@@ -47,6 +47,37 @@ func TestToSnakeCaseAndToKebabCase(t *testing.T) {
 		"\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD":                           "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD",
 
 		"abc_123_def": "abc_123_def",
+
+		// Samples from the package document.
+		"FirstName": "first_name",
+		"GO_PATH":   "go_path",
+		"GO PATH":   "go_path",
+		"GO-PATH":   "go_path",
+
+		// Already separated words are kept.
+		"HTTP_20x_OK": "http_20x_ok",
+		"1_2":         "1_2",
+
+		"aB":   "a_b",
+		"AB":   "ab",
+		"Ab":   "ab",
+		"A1":   "a1",
+		"AB12": "ab12",
+
+		// A digit in front of a word is kept in the same word, a digit
+		// before an upper case rune gets its own connector.
+		"12AB": "12_ab",
+		"1A":   "1_a",
+
+		// Punctuation and non-alphabet runes are kept as is.
+		"a.b":  "a.b",
+		"a'b":  "a'b",
+		"a😀b":  "a_😀_b",
+		"😀ABC": "😀_abc",
+
+		// CJK runes are not alphabetic, so they act like other runes.
+		"中ABC": "中_abc",
+		"ABC中": "abc_中",
 	}
 
 	runTestCases(t, ToSnakeCase, cases)
@@ -74,6 +105,22 @@ func TestToCamelCase(t *testing.T) {
 		"FROM CamelCase to snake/kebab-case": "fromCamelCaseToSnake/kebabCase",
 
 		"": "",
+
+		// Samples from the package document.
+		"some words":   "someWords",
+		"hello-world":  "helloWorld",
+		"hello world":  "helloWorld",
+		"HELLO":        "hello",
+		"helloWORLD":   "helloWORLD",
+		"some_1_thing": "some1Thing",
+		"1_abc":        "1Abc",
+		"abc_1":        "abc1",
+		"v1_2v":        "v12v",
+		"a__b":         "a_B",
+		"a  b":         "a B",
+		"1_2":          "12",
+		"_a_B_":        "_aB_",
+		"中文_测试":        "中文测试",
 	})
 }
 
@@ -93,6 +140,20 @@ func TestToPascalCase(t *testing.T) {
 		"FROM CamelCase to snake/kebab-case": "FromCamelCaseToSnake/kebabCase",
 
 		"": "",
+
+		"some words":   "SomeWords",
+		"hello-world":  "HelloWorld",
+		"HELLO":        "Hello",
+		"helloWORLD":   "HelloWORLD",
+		"some_1_thing": "Some1Thing",
+		"1_abc":        "1Abc",
+		"abc_1":        "Abc1",
+		"v1_2v":        "V12v",
+		"a__b":         "A_B",
+		"a  b":         "A B",
+		"1_2":          "12",
+		"_a_B_":        "_AB_",
+		"中文_测试":        "中文测试",
 	})
 }
 
@@ -103,6 +164,14 @@ func TestSwapCase(t *testing.T) {
 		"a":        "A",
 
 		"": "",
+
+		"A":     "a",
+		"HELLO": "hello",
+		"Hello": "hELLO",
+		"1":     "1",
+		"中":     "中",
+		"ß":     "ß", // unicode.ToUpper("ß") is "ß" in Go.
+		"İ":     "i",
 	})
 }
 
@@ -114,6 +183,12 @@ func TestFirstRuneToUpper(t *testing.T) {
 		"a":             "A",
 
 		"": "",
+
+		// A first rune which is not a lower case letter is kept as is.
+		"1abc":    "1abc",
+		"中abc":    "中abc",
+		"ßabc":    "ßabc",
+		"\xffabc": "\xffabc",
 	})
 }
 
@@ -126,6 +201,9 @@ func TestFirstRuneToLower(t *testing.T) {
 		"A":             "a",
 
 		"": "",
+
+		"1abc": "1abc",
+		"İabc": "iabc",
 	})
 }
 
@@ -144,6 +222,9 @@ func TestShuffle(t *testing.T) {
 		"facgbheidjk": "abcdefghijk",
 		"尝试中文":        "中尝文试",
 		"zh英文hun排":    "hhnuz排文英",
+
+		"a": "a",
+		"中": "中",
 	})
 }
 
@@ -212,6 +293,9 @@ func TestShuffleSource(t *testing.T) {
 		"facgbheidjk": "bkgfijached",
 		"尝试中文怎么样":     "怎试么中样尝文",
 		"zh英文hun排":    "zuhh文n英排",
+
+		"a": "a",
+		"中": "中",
 	})
 }
 
@@ -227,5 +311,30 @@ func TestSuccessor(t *testing.T) {
 
 		"来点中文试试":               "来点中文试诖",
 		"中cZ英ZZ文zZ混9zZ9杂99进z位": "中dA英AA文aA混0aA0杂00进a位",
+
+		// Carries which are absorbed by an alphanumeric rune on the left.
+		"z":  "aa",
+		"zz": "aaa",
+		"Z":  "AA",
+		"y9": "z0",
+		"a9": "b0",
+		"Z9": "AA0",
+		"z9": "aa0",
+		"8":  "9",
+
+		// A non-ASCII rune is incremented in place.
+		"中":   "丮",
+		"中中":  "中丮",
+		"a中":  "b中",
+		"a中z": "b中a",
+
+		// Incrementing the largest rune wraps over and yields the
+		// replacement rune, as documented.
+		"\U0010FFFF": "\uFFFD",
+
+		// A carry rune is inserted in front of the leftmost alphanumeric
+		// rune, even when it is not the first rune of the string.
+		"-zz": "-aaa",
+		"-ZZ": "-AAA",
 	})
 }
