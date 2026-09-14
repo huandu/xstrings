@@ -601,7 +601,7 @@ func Successor(str string) string {
 
 		case '9':
 			runes[i] = '0'
-			carry = '0'
+			carry = '1'
 			lastAlphanumeric = i
 		}
 	}
