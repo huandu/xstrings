@@ -69,7 +69,8 @@ func toCamelCase(str string, isBig bool) string {
 
 	if len(str) == 0 {
 		// A special case for a string contains only 1 rune.
-		if size != 0 {
+		// A connector is already written by the loop above.
+		if size != 0 && !isConnector(r0) {
 			buf.WriteRune(r0)
 		}
 

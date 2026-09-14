@@ -61,11 +61,8 @@ func TestIssueSuccessorSlicesMultibytePrefixByRune(t *testing.T) {
 // ToCamelCase/ToPascalCase: an input which contains connectors only returns an
 // extra copy of its last rune.
 //
-// current: ToCamelCase("_") == "__", ToCamelCase("-_-") == "-_--"
-// want:    "_", "-_-"
+// Regression test for #64.
 func TestIssueCamelCaseDuplicatesTrailingConnector(t *testing.T) {
-	t.Skip(`known bug: a connector-only input gets its last rune duplicated, e.g. ToCamelCase("_") == "__"`)
-
 	cases := _M{
 		"_":    "_",
 		"__":   "__",
