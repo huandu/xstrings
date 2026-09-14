@@ -170,7 +170,11 @@ func Scrub(str, repl string) string {
 	}
 
 	if buf != nil {
-		buf.WriteString(origin)
+		if hasError {
+			buf.WriteString(repl)
+		} else {
+			buf.WriteString(origin)
+		}
 		return buf.String()
 	}
 

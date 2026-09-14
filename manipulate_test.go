@@ -126,8 +126,13 @@ func TestScrub(t *testing.T) {
 
 	runTestCases(t, runner, _M{
 		sep("ab\uFFFDcd\xFF\xCEefg\xFF\xFC\xFD\xFAhijk", "*"): "ab*cd*efg*hijk",
-		sep("no错误です", "*"):                                    "no错误です",
-		sep("", "*"):                                          "",
+		sep("abc\xFF", "*"):      "abc*",
+		sep("\xFF", "*"):         "*",
+		sep("abc\xFF\xFE", "*"):  "abc*",
+		sep("ab\xFFcd\xFE", "*"): "ab*cd*",
+		sep("abc\xFF", ""):       "abc",
+		sep("no错误です", "*"):       "no错误です",
+		sep("", "*"):             "",
 	})
 }
 
