@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 func TestTranslate(t *testing.T) {
@@ -41,6 +42,62 @@ func TestTranslate(t *testing.T) {
 		sep("hel\uFFFDlo", "\uFFFD", "H"):    "helHlo",
 		sep("hel\uFFFDlo", "^\uFFFD", "H"):   "HHHHH",
 		sep("hel\uFFFDlo", "o-\uFFFDh", "H"): "HelHlH",
+
+		// An empty from pattern means nothing is translated.
+		sep("hello", "", "x"): "hello",
+		sep("hello", "", ""):  "hello",
+
+		sep("hello", "h", "H"):     "Hello",
+		sep("a\x00b", "\x00", "X"): "aXb",
+
+		// If no rune matches, the input is returned untouched.
+		sep("a\xffb", "z", "X"): "a\xffb",
+
+		// "^" alone matches every rune.
+		sep("abc", "^", "x"): "xxx",
+		sep("abc", "^", ""):  "",
+
+		// If to is shorter than from, the last rune in to is repeated.
+		sep("abcdef", "a-f", "xy"): "xyyyyy",
+		sep("abc", "a-c", "x-y"):   "xyy",
+
+		// Multiple from ranges are mapped one by one.
+		sep("abcdef", "a-cx-z", "1-34-5"): "123def",
+
+		// A range can be mapped to a single rune.
+		sep("hello", "a-k", "λ"): "λλllo",
+
+		// A reverted pattern uses the last rune of the to pattern only.
+		sep("hello", "^e-l", "1-3"): "hell3",
+
+		// A range may go backwards.
+		sep("zyx", "z-x", "a-c"): "abc",
+		sep("abc", "c-a", "1-3"): "321",
+		sep("abc", "abc", "z-a"): "zyx",
+
+		// A single rune in from is mapped to the first rune in to.
+		sep("hello", "l", "123"): "he11o",
+
+		// A range whose start and end are the same is a single rune.
+		sep("abc", "a-a", "x"): "xbc",
+
+		// A leading or trailing "-" is ignored.
+		sep("a-b", "a-", "x"): "x-b",
+		sep("a-b", "-a", "x"): "x-b",
+
+		// "-" must be escaped to be used as a normal character.
+		sep("a-b", `\-`, "x"): "axb",
+
+		// "\\" matches a single backslash.
+		sep(`a\b`, `\\`, "x"): "axb",
+
+		// An empty to pattern deletes matched runes.
+		sep("a-c", "a-c", ""): "-",
+
+		// A rune range which overlaps a single rune recorded earlier
+		// takes over that rune.
+		sep("中", "中一-龥", "XY"):  "Y",
+		sep("中一", "中一-龥", "XY"): "YY",
 	})
 }
 
@@ -56,6 +113,18 @@ func TestDelete(t *testing.T) {
 		sep("hello", "^a-k"):  "he",
 
 		sep("中文字符测试", "文中谁敢试？"): "字符测",
+
+		// An empty pattern deletes nothing.
+		sep("hello", ""): "hello",
+		sep("", "a"):     "",
+
+		// "^" alone deletes every rune.
+		sep("abc", "^"): "",
+
+		sep("a\x00b", "\x00"): "ab",
+
+		// Nothing matches, the input is returned untouched.
+		sep("a\uFFFDb", "z"): "a\uFFFDb",
 	})
 }
 
@@ -71,6 +140,15 @@ func TestCount(t *testing.T) {
 		sep("hello", "^a-k"):  "3",
 
 		sep("中文字符测试", "文中谁敢试？"): "3",
+
+		// An empty string or pattern counts zero runes.
+		sep("hello", ""): "0",
+		sep("", "a"):     "0",
+
+		sep("hello", "l"):       "2",
+		sep("hello", "^e-l"):    "1",
+		sep("abc", "^"):         "3",
+		sep("abcdef", "a-cx-z"): "3",
 	})
 }
 
@@ -92,5 +170,86 @@ func TestSqueeze(t *testing.T) {
 
 		sep("打打打打个劫！！", ""):  "打个劫！",
 		sep("打打打打个劫！！", "打"): "打个劫！！",
+
+		sep("", ""):          "",
+		sep("a", ""):         "a",
+		sep("aa", ""):        "a",
+		sep("aaa", "b"):      "aaa",
+		sep("aaabbb", "a-b"): "ab",
+		sep("中中中", "中"):      "中",
+
+		// "-" is a pattern character, escape it to match a literal dash.
+		sep("a-b--c", `\-`): "a-b-c",
+	})
+}
+
+func TestTranslatorHasPattern(t *testing.T) {
+	cases := []struct {
+		from string
+		to   string
+		want bool
+	}{
+		{"", "", false},
+		{"", "x", false},
+		{"a", "", true},
+		{"a", "b", true},
+		{"^", "", true},
+		{"^a", "b", true},
+	}
+
+	for _, c := range cases {
+		if got := NewTranslator(c.from, c.to).HasPattern(); got != c.want {
+			t.Fatalf("NewTranslator(%q, %q).HasPattern() = %v, want %v", c.from, c.to, got, c.want)
+		}
+	}
+}
+
+func TestTranslatorTranslateRune(t *testing.T) {
+	cases := []struct {
+		from, to string
+		r        rune
+		result   rune
+		matched  bool
+	}{
+		// A regular 1:1 mapping.
+		{"a-c", "x-z", 'a', 'x', true},
+		{"a-c", "x-z", 'b', 'y', true},
+		{"a-c", "x-z", 'c', 'z', true},
+		{"a-c", "x-z", 'd', 'd', false},
+		{"a-c", "x-z", '中', '中', false},
+
+		// A reverted pattern matches every rune but the listed ones.
+		{"^a-c", "z", 'a', 'a', false},
+		{"^a-c", "z", 'd', 'z', true},
+
+		// In "delete" mode (empty to pattern) matched runes are mapped to
+		// utf8.RuneError, which is then dropped by Translate.
+		{"ab", "", 'a', utf8.RuneError, true},
+		{"ab", "", 'x', 'x', false},
+
+		// Without any pattern every rune is returned as is.
+		{"", "", 'a', 'a', false},
+	}
+
+	for _, c := range cases {
+		tr := NewTranslator(c.from, c.to)
+		result, matched := tr.TranslateRune(c.r)
+
+		if result != c.result || matched != c.matched {
+			t.Fatalf("NewTranslator(%q, %q).TranslateRune(%q) = (%q, %v), want (%q, %v)",
+				c.from, c.to, c.r, result, matched, c.result, c.matched)
+		}
+	}
+}
+
+func TestTranslatorReuse(t *testing.T) {
+	tr := NewTranslator("aeiou", "12345")
+
+	runTestCases(t, tr.Translate, _M{
+		"hello": "h2ll4",
+		"world": "w4rld",
+		"":      "",
+		"aeiou": "12345",
+		"xyz":   "xyz",
 	})
 }

@@ -31,9 +31,39 @@ func TestExpandTabs(t *testing.T) {
 		sep("abc\td\tef\tghij\nk\tl", "3"): "abc   d  ef ghij\nk  l",
 		sep("abc\td\tef\tghij\nk\tl", "1"): "abc d ef ghij\nk l",
 
+		// A tab is expanded to at least one space, even at column 0.
+		sep("\t", "4"):   "    ",
+		sep("\t", "1"):   " ",
+		sep("\t\t", "3"): "      ",
+
+		// Trailing tabs and tabs after a newline are expanded as usual.
+		sep("a\t", "4"):    "a   ",
+		sep("\n\t", "4"):   "\n    ",
+		sep("\n\n\t", "2"): "\n\n  ",
+
+		// A wide rune occupies two columns.
+		sep("中\t", "4"):   "中  ",
+		sep("a中\tb", "4"): "a中 b",
+
+		sep("x\ty\tz", "8"): "x       y       z",
+
+		// NOTE: only '\n' resets the column, as documented. Python's
+		// str.expandtabs resets it on '\r' too.
+		sep("a\rb\tc", "4"): "a\rb  c",
+
 		sep("abc", "0"):  "tab size must be positive",
 		sep("abc", "-1"): "tab size must be positive",
 	})
+}
+
+func TestExpandTabsLongString(t *testing.T) {
+	// A long input makes allocBuffer clamp its initial capacity.
+	str := strings.Repeat("a", 600) + "\t" + strings.Repeat("中", 600) + "\t"
+	want := strings.Repeat("a", 600) + "    " + strings.Repeat("中", 600) + "    "
+
+	if got := ExpandTabs(str, 4); got != want {
+		t.Fatalf("ExpandTabs(long string, 4) = %q, want %q", got, want)
+	}
 }
 
 func TestLeftJustify(t *testing.T) {
@@ -54,6 +84,18 @@ func TestLeftJustify(t *testing.T) {
 
 		sep("hello中文test", "0", "123"): "hello中文test",
 		sep("hello中文test", "18", ""):   "hello中文test",
+
+		// Length is measured in runes, pad in runes as well.
+		sep("", "5", "ab"):    "ababa",
+		sep("abc", "3", "x"):  "abc",
+		sep("abc", "-1", "x"): "abc",
+		sep("中文", "4", "-"):   "中文--",
+		sep("中文", "4", "中文"):  "中文中文",
+		sep("a", "5", "中文"):   "a中文中文",
+		sep("a", "3", "中文"):   "a中文",
+
+		// A pad string is cut in the middle of its runes when needed.
+		sep("a", "2", "中文"): "a中",
 	})
 }
 
@@ -75,6 +117,14 @@ func TestRightJustify(t *testing.T) {
 
 		sep("hello中文test", "0", "123"): "hello中文test",
 		sep("hello中文test", "18", ""):   "hello中文test",
+
+		sep("", "5", "ab"):   "ababa",
+		sep("abc", "3", "x"): "abc",
+		sep("中文", "4", "-"):  "--中文",
+		sep("中文", "4", "中文"): "中文中文",
+		sep("a", "5", "中文"):  "中文中文a",
+		sep("a", "3", "中文"):  "中文a",
+		sep("a", "2", "中文"):  "中a",
 	})
 }
 
@@ -96,5 +146,17 @@ func TestCenter(t *testing.T) {
 
 		sep("hello中文test", "0", "123"): "hello中文test",
 		sep("hello中文test", "18", ""):   "hello中文test",
+
+		sep("", "5", "ab"):   "ababa",
+		sep("abc", "3", "x"): "abc",
+		sep("中文", "4", "-"):  "-中文-",
+		sep("中文", "4", "中文"): "中中文中",
+		sep("a", "5", "中文"):  "中文a中文",
+		sep("a", "3", "中文"):  "中a中",
+		sep("a", "2", "中文"):  "a中",
+
+		// No padding is added when there is no room for it.
+		sep("x", "0", "y"): "x",
+		sep("x", "1", "y"): "x",
 	})
 }
