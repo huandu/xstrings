@@ -91,6 +91,12 @@ func TestToSnakeCaseAndToKebabCase(t *testing.T) {
 
 func TestToCamelCase(t *testing.T) {
 	runTestCases(t, ToCamelCase, _M{
+		"option_A":        "optionA",
+		"option-A":        "optionA",
+		"option A":        "optionA",
+		"HTTP_X":          "httpX",
+		"é_Ö":             "éÖ",
+		"a__B":            "a_B",
 		"http_server":     "httpServer",
 		"_camel_case":     "_camelCase",
 		"no_https":        "noHttps",
@@ -126,6 +132,12 @@ func TestToCamelCase(t *testing.T) {
 
 func TestToPascalCase(t *testing.T) {
 	runTestCases(t, ToPascalCase, _M{
+		"option_A":        "OptionA",
+		"option-A":        "OptionA",
+		"option A":        "OptionA",
+		"HTTP_X":          "HttpX",
+		"é_Ö":             "ÉÖ",
+		"a__B":            "A_B",
 		"http_server":     "HttpServer",
 		"_camel_case":     "_CamelCase",
 		"no_https":        "NoHttps",
