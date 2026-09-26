@@ -114,6 +114,65 @@ func TestTranslate(t *testing.T) {
 	})
 }
 
+func TestTranslateReplacementCharacterPatterns(t *testing.T) {
+	cases := []struct {
+		name, str, from, to, want string
+	}{
+		{"from start", "\uFFFDa", "\uFFFDa", "xy", "xy"},
+		{"from middle", "a\uFFFDb", "a\uFFFDb", "xyz", "xyz"},
+		{"from end", "a\uFFFD", "a\uFFFD", "xy", "xy"},
+		{"to start", "ab", "ab", "\uFFFDx", "\uFFFDx"},
+		{"to middle", "abc", "abc", "x\uFFFDy", "x\uFFFDy"},
+		{"to end", "ab", "ab", "x\uFFFD", "x\uFFFD"},
+		{"repeated last rune", "abc", "abc", "x\uFFFD", "x\uFFFD\uFFFD"},
+		{"from ascending range", "\uFFFC\uFFFD", "\uFFFC-\uFFFD", "a-b", "ab"},
+		{"from descending range", "\uFFFD\uFFFC", "\uFFFD-\uFFFC", "a-b", "ab"},
+		{"to ascending range", "ab", "ab", "\uFFFC-\uFFFD", "\uFFFC\uFFFD"},
+		{"to descending range", "ab", "ab", "\uFFFD-\uFFFC", "\uFFFD\uFFFC"},
+		{"escaped literal", "\uFFFDa", "\\\uFFFDa", "xy", "xy"},
+		{"reverted pattern", "\uFFFDab", "^\uFFFDa", "x", "\uFFFDax"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := Translate(c.str, c.from, c.to); got != c.want {
+				t.Errorf("Translate(%q, %q, %q) = %q, want %q", c.str, c.from, c.to, got, c.want)
+			}
+		})
+	}
+}
+
+func TestTranslatorIgnoredPatternCharacters(t *testing.T) {
+	// Keep the existing replacement-rune fallback for patterns with no literals.
+	for _, pattern := range []string{"-", "---", "\\"} {
+		if got := Translate("\uFFFDab", pattern, "x"); got != "xab" {
+			t.Errorf("Translate with from %q = %q, want %q", pattern, got, "xab")
+		}
+		if got := Translate("\uFFFDab", "^"+pattern, "x"); got != "\uFFFDxx" {
+			t.Errorf("Translate with reverted from %q = %q", pattern, got)
+		}
+		tr := NewTranslator("ab", pattern)
+		if got, matched := tr.TranslateRune('a'); !matched || got != utf8.RuneError {
+			t.Errorf("TranslateRune with to %q = (%U, %v)", pattern, got, matched)
+		}
+	}
+}
+
+func TestDeleteCountReplacementCharacterPatterns(t *testing.T) {
+	str := "\uFFFDa\uFFFDb"
+	for _, pattern := range []string{"\uFFFDa", "a\uFFFD"} {
+		if got := Delete(str, pattern); got != "b" {
+			t.Errorf("Delete(%q, %q) = %q, want %q", str, pattern, got, "b")
+		}
+		if got := Count(str, pattern); got != 3 {
+			t.Errorf("Count(%q, %q) = %d, want 3", str, pattern, got)
+		}
+		tr := NewTranslator(pattern, "")
+		if got, matched := tr.TranslateRune(utf8.RuneError); !matched || got != utf8.RuneError {
+			t.Errorf("TranslateRune for deletion with from %q = (%U, %v)", pattern, got, matched)
+		}
+	}
+}
+
 func TestTranslateCountDeleteConsistency(t *testing.T) {
 	// Count reports how many runes match the pattern and Delete removes
 	// exactly those runes, so Delete must not drop anything else. This used
