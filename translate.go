@@ -121,6 +121,11 @@ func NewTranslator(from, to string) *Translator {
 				singleRunes = tr.addRune(fromStart, toStart, singleRunes)
 				updateRange()
 				fromStart += fromRangeStep
+				// The last source rune still needs its own mapping.
+				if fromStart == fromEnd {
+					singleRunes = tr.addRune(fromStart, toStart, singleRunes)
+					updateRange()
+				}
 				continue
 			}
 
