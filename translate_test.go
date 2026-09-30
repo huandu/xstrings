@@ -63,6 +63,24 @@ func TestTranslate(t *testing.T) {
 		sep("abcdef", "a-f", "xy"): "xyyyyy",
 		sep("abc", "a-c", "x-y"):   "xyy",
 
+		// A from range keeps its last rune when to contains single runes.
+		sep("ab", "a-b", "xy"):         "xy",
+		sep("ab", "a-b", "xyz"):        "xy",
+		sep("abc", "a-c", "xyz"):       "xyz",
+		sep("abc", "a-c", "xyzw"):      "xyz",
+		sep("ab", "b-a", "xy"):         "yx",
+		sep("abc", "a-bc", "xyz"):      "xyz",
+		sep("abc", "ab-c", "xyz"):      "xyz",
+		sep("abcdef", "a-bc-f", "xyz"): "xyzzzz",
+		sep("abc", "a-c", "wx-z"):      "wxy",
+		sep("abc", "a-c", "w-xy"):      "wxy",
+		sep("abc", "a-c", "wx-yz"):     "wxy",
+		sep("αβγ", "α-γ", "xyz"):       "xyz",
+		sep("αβγ", "γ-α", "xyz"):       "zyx",
+		sep("ab", "a-b", "αβ"):         "αβ",
+		sep("ab", "a-b", "x\x00"):      "x\x00",
+		sep("a-b", "a-b", `\-x`):       "--x",
+
 		// Multiple from ranges are mapped one by one.
 		sep("abcdef", "a-cx-z", "1-34-5"): "123def",
 
