@@ -569,11 +569,11 @@ func Squeeze(str, pattern string) string {
 			}
 
 			if skipSqueeze {
-				output.WriteRune(r)
+				output.WriteString(str[:size])
 			}
 		} else {
 			if output != nil {
-				output.WriteRune(r)
+				output.WriteString(str[:size])
 			}
 
 			last = r
