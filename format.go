@@ -55,7 +55,7 @@ func ExpandTabs(str string, tabSize int) string {
 			}
 
 			if output != nil {
-				output.WriteRune(r)
+				output.WriteString(str[:size])
 			}
 		}
 
