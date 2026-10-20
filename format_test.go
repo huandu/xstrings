@@ -96,6 +96,10 @@ func TestLeftJustify(t *testing.T) {
 
 		// A pad string is cut in the middle of its runes when needed.
 		sep("a", "2", "中文"): "a中",
+
+		// Invalid UTF-8 bytes in the pad are preserved.
+		sep("a", "2", "\xffx"):  "a\xff",
+		sep("a", "3", "x\xffy"): "ax\xff",
 	})
 }
 
@@ -125,6 +129,9 @@ func TestRightJustify(t *testing.T) {
 		sep("a", "5", "中文"):  "中文中文a",
 		sep("a", "3", "中文"):  "中文a",
 		sep("a", "2", "中文"):  "中a",
+
+		// Invalid UTF-8 bytes in the pad are preserved.
+		sep("a", "2", "\xffx"): "\xffa",
 	})
 }
 
@@ -158,5 +165,9 @@ func TestCenter(t *testing.T) {
 		// No padding is added when there is no room for it.
 		sep("x", "0", "y"): "x",
 		sep("x", "1", "y"): "x",
+
+		// Invalid UTF-8 bytes in the pad are preserved.
+		sep("a", "2", "\xffx"):  "a\xff",
+		sep("a", "4", "x\xffy"): "xax\xff",
 	})
 }
