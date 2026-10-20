@@ -289,6 +289,14 @@ func TestSqueeze(t *testing.T) {
 
 		// "-" is a pattern character, escape it to match a literal dash.
 		sep("a-b--c", `\-`): "a-b-c",
+
+		// Preserve bytes outside the runes being squeezed.
+		sep("aa\xffb", "a"):     "a\xffb",
+		sep("aa\xffb", "z"):     "aa\xffb",
+		sep("aa\xffb", ""):      "a\xffb",
+		sep("aa\xff\xfeb", "a"): "a\xff\xfeb",
+		sep("\xffaab", "a"):     "\xffab",
+		sep("aa中中\xff", "中"):    "aa中\xff",
 	})
 }
 
