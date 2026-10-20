@@ -189,6 +189,10 @@ func TestSwapCase(t *testing.T) {
 
 func TestFirstRuneToUpper(t *testing.T) {
 	runTestCases(t, FirstRuneToUpper, _M{
+		"ǅuro":          "Ǆuro",
+		"ǈubav":         "Ǉubav",
+		"ⅳ chapter":     "Ⅳ chapter",
+		"ⓐ label":       "Ⓐ label",
 		"hello, world!": "Hello, world!",
 		"Hello, world!": "Hello, world!",
 		"你好，世界！":        "你好，世界！",
@@ -196,7 +200,7 @@ func TestFirstRuneToUpper(t *testing.T) {
 
 		"": "",
 
-		// A first rune which is not a lower case letter is kept as is.
+		// A first rune without an uppercase mapping is kept as is.
 		"1abc":    "1abc",
 		"中abc":    "中abc",
 		"ßabc":    "ßabc",
@@ -206,6 +210,10 @@ func TestFirstRuneToUpper(t *testing.T) {
 
 func TestFirstRuneToLower(t *testing.T) {
 	runTestCases(t, FirstRuneToLower, _M{
+		"ǅuro":          "ǆuro",
+		"ǈubav":         "ǉubav",
+		"Ⅳ chapter":     "ⅳ chapter",
+		"Ⓐ label":       "ⓐ label",
 		"hello, world!": "hello, world!",
 		"Hello, world!": "hello, world!",
 		"你好，世界！":        "你好，世界！",
