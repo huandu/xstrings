@@ -297,6 +297,16 @@ func TestSqueeze(t *testing.T) {
 		sep("aa\xff\xfeb", "a"): "a\xff\xfeb",
 		sep("\xffaab", "a"):     "\xffab",
 		sep("aa中中\xff", "中"):    "aa中\xff",
+
+		// Distinct invalid byte sequences are not repeated runes, even
+		// though they all decode to utf8.RuneError.
+		sep("\xff\xfe", ""):         "\xff\xfe",
+		sep("aa\xff\xfe", ""):       "a\xff\xfe",
+		sep("\xff\uFFFD", ""):       "\xff\uFFFD",
+		sep("\xff\uFFFD", "\uFFFD"): "\xff\uFFFD",
+		sep("\xff\xff", ""):         "\xff",
+		sep("\xff\xff", "\uFFFD"):   "\xff",
+		sep("\xff\xff", "a"):        "\xff\xff",
 	})
 }
 
