@@ -27,6 +27,9 @@ func TestExpandTabs(t *testing.T) {
 		sep("abcdefg\thij\nk\tl", "4"):  "abcdefg hij\nk   l",
 		sep("z中\t文\tw", "4"):            "z中 文  w",
 		sep("abcdef", "4"):              "abcdef",
+		sep("\t\xffx", "4"):             "    \xffx",
+		sep("\xff\t\xfe", "4"):          "\xff    \xfe",
+		sep("\t\uFFFD", "4"):            "    \uFFFD",
 
 		sep("abc\td\tef\tghij\nk\tl", "3"): "abc   d  ef ghij\nk  l",
 		sep("abc\td\tef\tghij\nk\tl", "1"): "abc d ef ghij\nk l",
