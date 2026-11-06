@@ -370,7 +370,7 @@ func (tr *Translator) TranslateRune(r rune) (result rune, translated bool) {
 func (tr *Translator) translateRune(r rune) (result rune, matched, deleted bool) {
 	switch {
 	case tr.quickDict != nil:
-		if r <= unicode.MaxASCII {
+		if 0 <= r && r <= unicode.MaxASCII {
 			if tr.quickDict.Set[r] {
 				result = tr.quickDict.Dict[r]
 				matched = true

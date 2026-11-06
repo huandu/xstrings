@@ -373,6 +373,45 @@ func TestTranslatorTranslateRune(t *testing.T) {
 	}
 }
 
+func TestTranslatorTranslateRuneNegativeInputs(t *testing.T) {
+	cases := []struct {
+		name, from, to string
+		result         rune
+		matched        bool
+	}{
+		{"ASCII literal", "a", "x", 0, false},
+		{"ASCII deletion", "a", "", 0, false},
+		{"mixed literals", "中a", "xy", 0, false},
+		{"complement", "^a", "x", 'x', true},
+		{"complement deletion", "^a", "", utf8.RuneError, true},
+		{"range only", "a-c", "x", 0, false},
+		{"Unicode only", "中", "x", 0, false},
+		{"empty pattern", "", "x", 0, false},
+	}
+
+	for _, c := range cases {
+		for _, r := range []rune{-1, -2, -1 << 31} {
+			t.Run(fmt.Sprintf("%s/%d", c.name, r), func(t *testing.T) {
+				defer func() {
+					if failure := recover(); failure != nil {
+						t.Errorf("TranslateRune(%d) panicked: %v", r, failure)
+					}
+				}()
+
+				want := r
+				if c.matched {
+					want = c.result
+				}
+				result, matched := NewTranslator(c.from, c.to).TranslateRune(r)
+				if result != want || matched != c.matched {
+					t.Errorf("NewTranslator(%q, %q).TranslateRune(%d) = (%d, %v), want (%d, %v)",
+						c.from, c.to, r, result, matched, want, c.matched)
+				}
+			})
+		}
+	}
+}
+
 func TestTranslatorReuse(t *testing.T) {
 	tr := NewTranslator("aeiou", "12345")
 
