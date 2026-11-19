@@ -348,6 +348,9 @@ func TestTranslatorTranslateRune(t *testing.T) {
 		// A reverted pattern matches every rune but the listed ones.
 		{"^a-c", "z", 'a', 'a', false},
 		{"^a-c", "z", 'd', 'z', true},
+		{"^", "z", 0, 'z', true},
+		{"^", "z", '\U0010ffff', 'z', true},
+		{"^", "z", utf8.RuneError, 'z', true},
 
 		// In "delete" mode (empty to pattern) matched runes are mapped to
 		// utf8.RuneError, which is then dropped by Translate.
@@ -373,24 +376,24 @@ func TestTranslatorTranslateRune(t *testing.T) {
 	}
 }
 
-func TestTranslatorTranslateRuneNegativeInputs(t *testing.T) {
+func TestTranslatorTranslateRuneInvalidInputs(t *testing.T) {
 	cases := []struct {
 		name, from, to string
-		result         rune
-		matched        bool
 	}{
-		{"ASCII literal", "a", "x", 0, false},
-		{"ASCII deletion", "a", "", 0, false},
-		{"mixed literals", "中a", "xy", 0, false},
-		{"complement", "^a", "x", 'x', true},
-		{"complement deletion", "^a", "", utf8.RuneError, true},
-		{"range only", "a-c", "x", 0, false},
-		{"Unicode only", "中", "x", 0, false},
-		{"empty pattern", "", "x", 0, false},
+		{"ASCII literal", "a", "x"},
+		{"ASCII deletion", "a", ""},
+		{"mixed literals", "中a", "xy"},
+		{"complement", "^a", "x"},
+		{"complement deletion", "^a", ""},
+		{"standalone complement", "^", "x"},
+		{"standalone complement deletion", "^", ""},
+		{"range only", "a-c", "x"},
+		{"Unicode only", "中", "x"},
+		{"empty pattern", "", "x"},
 	}
 
 	for _, c := range cases {
-		for _, r := range []rune{-1, -2, -1 << 31} {
+		for _, r := range []rune{-1, -2, -1 << 31, 0xd800, 0xdfff, 0x110000, 1<<31 - 1} {
 			t.Run(fmt.Sprintf("%s/%d", c.name, r), func(t *testing.T) {
 				defer func() {
 					if failure := recover(); failure != nil {
@@ -398,14 +401,24 @@ func TestTranslatorTranslateRuneNegativeInputs(t *testing.T) {
 					}
 				}()
 
-				want := r
-				if c.matched {
-					want = c.result
+				tr := NewTranslator(c.from, c.to)
+				if c.from == "^a" && tr.quickDict == nil {
+					t.Fatal("expected ASCII complement to use quickDict")
 				}
-				result, matched := NewTranslator(c.from, c.to).TranslateRune(r)
-				if result != want || matched != c.matched {
+				if c.from == "^" && tr.quickDict != nil {
+					t.Fatal("expected standalone complement to have no quickDict")
+				}
+
+				result, matched, deleted := tr.translateRune(r)
+				if result != r || matched || deleted {
+					t.Errorf("translateRune(%d) = (%d, %v, %v), want (%d, false, false)",
+						r, result, matched, deleted, r)
+				}
+
+				result, matched = tr.TranslateRune(r)
+				if result != r || matched {
 					t.Errorf("NewTranslator(%q, %q).TranslateRune(%d) = (%d, %v), want (%d, %v)",
-						c.from, c.to, r, result, matched, want, c.matched)
+						c.from, c.to, r, result, matched, r, false)
 				}
 			})
 		}
