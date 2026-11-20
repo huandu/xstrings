@@ -368,6 +368,10 @@ func (tr *Translator) TranslateRune(r rune) (result rune, translated bool) {
 // The two flags can't be folded into the returned rune: utf8.RuneError is a
 // valid rune value which can be a translation result as well.
 func (tr *Translator) translateRune(r rune) (result rune, matched, deleted bool) {
+	if !utf8.ValidRune(r) {
+		return r, false, false
+	}
+
 	switch {
 	case tr.quickDict != nil:
 		if r <= unicode.MaxASCII {
