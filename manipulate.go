@@ -190,8 +190,9 @@ func Scrub(str, repl string) string {
 // WordSplit splits a string into words. Returns a slice of words.
 // If there is no word in a string, return nil.
 //
-// Word is defined as a locale dependent string containing alphabetic characters,
-// which may also contain but not start with `'` and `-` characters.
+// A word consists of Unicode letters, excluding certain CJK ideograph ranges.
+// It may also contain ASCII apostrophes and hyphens, but cannot start with them.
+// The classification does not use the system locale.
 func WordSplit(str string) []string {
 	var word string
 	var words []string
