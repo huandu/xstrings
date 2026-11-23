@@ -15,8 +15,9 @@ func Len(str string) int {
 
 // WordCount returns number of words in a string.
 //
-// Word is defined as a locale dependent string containing alphabetic characters,
-// which may also contain but not start with `'` and `-` characters.
+// A word consists of Unicode letters, excluding certain CJK ideograph ranges.
+// It may also contain ASCII apostrophes and hyphens, but cannot start with them.
+// The classification does not use the system locale.
 func WordCount(str string) int {
 	var r rune
 	var size, n int
