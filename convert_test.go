@@ -184,6 +184,15 @@ func TestSwapCase(t *testing.T) {
 		"中":     "中",
 		"ß":     "ß", // unicode.ToUpper("ß") is "ß" in Go.
 		"İ":     "i",
+
+		// Bytes outside cased runes are preserved, including invalid UTF-8.
+		"\xff":          "\xff",
+		"\xffAb":        "\xffaB",
+		"A\xffb":        "a\xffB",
+		"Ab\xff":        "aB\xff",
+		"A\xff\xfeb":    "a\xff\xfeB",
+		"A\xe2\x82":     "a\xe2\x82",
+		"İ\xffλ\uFFFD中": "i\xffΛ\uFFFD中",
 	})
 }
 
