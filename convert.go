@@ -452,7 +452,7 @@ func SwapCase(str string) string {
 			buf.WriteRune(unicode.ToUpper(r))
 
 		default:
-			buf.WriteRune(r)
+			buf.WriteString(str[:size])
 		}
 
 		str = str[size:]
