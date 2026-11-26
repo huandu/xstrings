@@ -82,11 +82,10 @@ func TestWordCount(t *testing.T) {
 		"\U00020000": "0",
 		"\U0002b81d": "0",
 
-		// NOTE: the CJK ranges in isAlphabet are hard coded and stop at
-		// the boundaries above, so CJK runes which were assigned later
-		// (Unicode 8.0 added U+9FCD..) are counted as words.
-		"\u4d86": "1",
-		"\u9fcd": "1",
+		// CJK ideographs assigned after the original hard-coded ranges.
+		"\u4d86":     "0",
+		"\u9fcd":     "0",
+		"\U0002ceb0": "0",
 	})
 }
 
