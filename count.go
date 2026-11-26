@@ -15,7 +15,7 @@ func Len(str string) int {
 
 // WordCount returns number of words in a string.
 //
-// A word consists of Unicode letters, excluding certain CJK ideograph ranges.
+// A word consists of Unicode letters, excluding Han ideographs.
 // It may also contain ASCII apostrophes and hyphens, but cannot start with them.
 // The classification does not use the system locale.
 func WordCount(str string) int {
